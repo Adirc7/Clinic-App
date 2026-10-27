@@ -1,0 +1,21 @@
+# Secrets — never commit these
+.env
+.env.*
+!.env.example
+**/.env
+**/.env.*
+!**/.env.example
+
+# Dependencies / build output
+node_modules/
+.expo/
+dist/
+web-build/
+
+# Uploaded files (personal photos / medical records)
+backend/uploads/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+*.log

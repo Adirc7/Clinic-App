@@ -1,0 +1,54 @@
+{
+  "expo": {
+    "name": "MediCare Clinic",
+    "slug": "MediCare-Clinic",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/icon.png",
+    "scheme": "medicareclinic",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.adirc7.medicareclinic"
+    },
+    "android": {
+      "package": "com.adirc7.medicareclinic",
+      "adaptiveIcon": {
+        "backgroundColor": "#FFFFFF",
+        "foregroundImage": "./assets/images/adaptive-icon.png"
+      },
+      "edgeToEdgeEnabled": true,
+      "predictiveBackGestureEnabled": false
+    },
+    "web": {
+      "output": "single",
+      "favicon": "./assets/images/favicon.png",
+      "bundler": "metro"
+    },
+    "plugins": [
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/images/splash-logo.png",
+          "imageWidth": 240,
+          "resizeMode": "contain",
+          "backgroundColor": "#ffffff"
+        }
+      ],
+      "@react-native-community/datetimepicker",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Allow MediCare Clinic to access your photos to set a profile picture."
+        }
+      ]
+    ],
+    "experiments": {},
+    "extra": {
+      "eas": {
+        "projectId": "034a5460-ae38-4807-9c1c-cffdad42f823"
+      }
+    }
+  }
+}
