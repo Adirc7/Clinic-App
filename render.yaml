@@ -1,5 +1,6 @@
 # Render Blueprint — deploys the Express backend as a free web service.
-# In Render: New + > Blueprint > pick this repo. Then fill in the secret env vars it asks for.
+# In Render: New + > Blueprint > pick this repo. Then fill in the secret env vars it asks for
+# (MONGO_URI, ADMIN_EMAIL, ADMIN_PASSWORD). Cloudinary keys can be added later under Environment.
 services:
   - type: web
     name: medicare-clinic-api
@@ -25,10 +26,4 @@ services:
       - key: ADMIN_EMAIL
         sync: false
       - key: ADMIN_PASSWORD
-        sync: false
-      - key: CLOUDINARY_CLOUD_NAME
-        sync: false
-      - key: CLOUDINARY_API_KEY
-        sync: false
-      - key: CLOUDINARY_API_SECRET
         sync: false
