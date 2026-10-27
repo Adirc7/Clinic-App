@@ -1,4 +1,5 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useContext } from 'react';
+import { BottomTabBarHeightContext } from '@react-navigation/bottom-tabs';
 import {
   View,
   Text,
@@ -6,23 +7,25 @@ import {
   TouchableOpacity,
   ScrollView,
   Alert,
-  ActivityIndicator,
   Modal,
   TextInput,
   KeyboardAvoidingView,
   Platform,
+  Pressable,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import axiosInstance from '../../api/axiosInstance';
 import Avatar from '../../components/Avatar';
-import { doctorName } from '../../theme';
+import { Button, GradientHeader } from '../../components/ui';
+import { colors, doctorName, radius, shadow } from '../../theme';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Calendar } from 'react-native-calendars';
 import { toDateKey, addDays } from '../../utils/date';
 
 export default function DoctorDetailScreen({ route, navigation, currentUser }) {
   const { doctor, editingAppointment } = route.params;
+  // Height of the patient tab bar (undefined when shown outside the tabs)
+  const tabBarHeight = useContext(BottomTabBarHeightContext) || 0;
   const [selectedDate, setSelectedDate] = useState(editingAppointment ? {
     fullDate: new Date(editingAppointment.date),
     day: new Date(editingAppointment.date).toLocaleDateString('en-US', { weekday: 'short' }),
@@ -217,7 +220,7 @@ export default function DoctorDetailScreen({ route, navigation, currentUser }) {
       if (isAvailable) {
         marks[dateString] = {
           marked: true,
-          dotColor: '#0DB591',
+          dotColor: colors.primary,
           disabled: false,
         };
       } else {
@@ -236,12 +239,12 @@ export default function DoctorDetailScreen({ route, navigation, currentUser }) {
         marks[selectedStr] = {
           ...marks[selectedStr],
           selected: true,
-          selectedColor: '#0DB591',
+          selectedColor: colors.primary,
         };
       } else {
         marks[selectedStr] = {
           selected: true,
-          selectedColor: '#0DB591',
+          selectedColor: colors.primary,
         };
       }
     }
@@ -293,115 +296,113 @@ export default function DoctorDetailScreen({ route, navigation, currentUser }) {
   }, [selectedDate, doctor.schedule]);
 
   return (
-    <SafeAreaView style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.iconButton}>
-          <Ionicons name="chevron-back" size={24} color="#333" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Doctor Detail</Text>
-        <View style={styles.iconButton} />
-      </View>
-
+    <View style={styles.container}>
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        {/* Profile Section */}
-        <View style={styles.profileSection}>
-          <Avatar name={doctor.name} photo={doctor.profilePhoto} size={70} radius={12} style={styles.profileImage} />
-          <View style={styles.profileInfo}>
-            <Text style={styles.doctorName}>
-              {doctorName(doctor.name)}
-            </Text>
-            <Text style={styles.specialization}>{doctor.specialization || 'General Practice'}</Text>
-            
-            <View style={styles.statsRow}>
-              <View style={styles.statItem}>
-                <View style={styles.statIconContainer}>
-                   <Ionicons name="star" size={12} color="#0DB591" />
-                </View>
-                <Text style={styles.statText}>{doctor.averageRating || '5.0'}</Text>
-              </View>
-              <View style={styles.statItem}>
-                <View style={styles.statIconContainer}>
-                   <Ionicons name="location" size={12} color="#0DB591" />
-                </View>
-                <Text style={styles.statText}>800m away</Text>
+        {/* Hero */}
+        <GradientHeader style={{ paddingBottom: 70 }}>
+          <View style={styles.header}>
+            <Pressable onPress={() => navigation.goBack()} hitSlop={10} style={styles.iconButton}>
+              <Ionicons name="chevron-back" size={20} color="#fff" />
+            </Pressable>
+            <Text style={styles.headerTitle}>{editingAppointment ? 'Update appointment' : 'Doctor profile'}</Text>
+            <View style={{ width: 40 }} />
+          </View>
+          <View style={styles.profileSection}>
+            <Avatar name={doctor.name} photo={doctor.profilePhoto} size={84} radius={26} style={styles.profileImage} />
+            <View style={styles.profileInfo}>
+              <Text style={styles.doctorName} numberOfLines={2}>{doctorName(doctor.name)}</Text>
+              <Text style={styles.specialization}>{doctor.specialization || 'General Practice'}</Text>
+              <View style={styles.verified}>
+                <Ionicons name="shield-checkmark" size={12} color="#fff" />
+                <Text style={styles.verifiedText}>Verified specialist</Text>
               </View>
             </View>
           </View>
+        </GradientHeader>
+
+        {/* Stats card overlapping the hero */}
+        <View style={styles.statsRow}>
+          {[
+            { icon: 'star', color: '#F59E0B', value: doctor.averageRating || '5.0', label: 'Rating' },
+            { icon: 'chatbubble-ellipses', color: colors.info, value: String(doctor.totalReviews || 0), label: 'Reviews' },
+            { icon: 'briefcase', color: colors.primary, value: (doctor.experience || '—').replace(/\s*years?/i, ' yrs'), label: 'Experience' },
+          ].map((st) => (
+            <View key={st.label} style={styles.statItem}>
+              <View style={[styles.statIconContainer, { backgroundColor: st.color + '1A' }]}>
+                <Ionicons name={st.icon} size={16} color={st.color} />
+              </View>
+              <Text style={styles.statText} numberOfLines={1}>{st.value}</Text>
+              <Text style={styles.statLabel}>{st.label}</Text>
+            </View>
+          ))}
         </View>
 
-        {/* About Section */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>About</Text>
-          <View style={styles.aboutContent}>
-            {doctor.experience && (
-              <View style={styles.aboutItem}>
-                <Ionicons name="briefcase" size={16} color="#0DB591" />
-                <Text style={styles.aboutText}>{doctor.experience}</Text>
-              </View>
-            )}
-            {doctor.qualifications && (
-              <View style={styles.aboutItem}>
-                <Ionicons name="school" size={16} color="#0DB591" />
-                <Text style={styles.aboutText}>{doctor.qualifications}</Text>
-              </View>
-            )}
-            {doctor.phone && (
-              <View style={styles.aboutItem}>
-                <Ionicons name="call" size={16} color="#0DB591" />
-                <Text style={styles.aboutText}>{doctor.phone}</Text>
-              </View>
-            )}
-          </View>
-        </View>
-
-        {/* Availability Section */}
-        {doctor.schedule?.days && doctor.schedule.days.length > 0 && (
+        <View style={styles.body}>
+          {/* About */}
           <View style={styles.section}>
-            <View style={styles.sectionHeader}>
-              <Text style={styles.sectionTitle}>Available Hours</Text>
-              <View style={styles.availableBadge}>
-                <View style={styles.pulseDot} />
-                <Text style={styles.availableText}>Available Now</Text>
-              </View>
-            </View>
-            <View style={styles.availabilityGrid}>
-              {doctor.schedule.days.map((slot, index) => (
-                <View key={index} style={styles.availabilityItem}>
-                  <Text style={styles.dayName}>{slot.day}</Text>
-                  <Text style={styles.dayTime}>{slot.startTime} - {slot.endTime}</Text>
+            <Text style={styles.sectionTitle}>About</Text>
+            <View style={styles.aboutContent}>
+              {doctor.qualifications ? (
+                <View style={styles.aboutItem}>
+                  <View style={styles.aboutIcon}><Ionicons name="school-outline" size={16} color={colors.primary} /></View>
+                  <View style={{ flex: 1 }}>
+                    <Text style={styles.aboutLabel}>Qualifications</Text>
+                    <Text style={styles.aboutText}>{doctor.qualifications}</Text>
+                  </View>
                 </View>
-              ))}
+              ) : null}
+              {doctor.phone ? (
+                <View style={styles.aboutItem}>
+                  <View style={styles.aboutIcon}><Ionicons name="call-outline" size={16} color={colors.primary} /></View>
+                  <View style={{ flex: 1 }}>
+                    <Text style={styles.aboutLabel}>Contact</Text>
+                    <Text style={styles.aboutText}>{doctor.phone}</Text>
+                  </View>
+                </View>
+              ) : null}
             </View>
           </View>
-        )}
 
-        {/* Booking Advices */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Booking Advices</Text>
+          {/* Weekly availability */}
+          {doctor.schedule?.days && doctor.schedule.days.length > 0 && (
+            <View style={styles.section}>
+              <View style={styles.sectionHeader}>
+                <Text style={styles.sectionTitle}>Weekly hours</Text>
+                <View style={styles.availableBadge}>
+                  <View style={styles.pulseDot} />
+                  <Text style={styles.availableText}>Accepting bookings</Text>
+                </View>
+              </View>
+              <View style={styles.availabilityGrid}>
+                {doctor.schedule.days.map((slot, index) => (
+                  <View key={index} style={styles.availabilityItem}>
+                    <Text style={styles.dayName}>{slot.day.slice(0, 3)}</Text>
+                    <Text style={styles.dayTime}>{slot.startTime.replace(' ', '')}{'\n'}{slot.endTime.replace(' ', '')}</Text>
+                  </View>
+                ))}
+              </View>
+            </View>
+          )}
+
+          {/* Booking tips */}
           <View style={styles.adviceBox}>
             <View style={styles.adviceItem}>
-              <Ionicons name="information-circle-outline" size={18} color="#0DB591" />
+              <Ionicons name="information-circle" size={18} color={colors.primary} />
               <Text style={styles.adviceText}>Please arrive 15 minutes before your scheduled time.</Text>
             </View>
             <View style={styles.adviceItem}>
-              <Ionicons name="time-outline" size={18} color="#0DB591" />
+              <Ionicons name="time" size={18} color={colors.primary} />
               <Text style={styles.adviceText}>
-                {settings.allowAnytimeBooking 
-                  ? "Appointments can be booked anytime before treatment." 
-                  : `Appointments can only be rescheduled or deleted ${settings.minBookingDays} days in advance.`}
+                {settings.allowAnytimeBooking
+                  ? 'Appointments can be booked any day the doctor is available.'
+                  : `Appointments must be booked at least ${settings.minBookingDays} days in advance.`}
               </Text>
             </View>
-            <View style={styles.adviceItem}>
-              <Ionicons name="calendar-outline" size={18} color="#0DB591" />
-              <Text style={styles.adviceText}>Select only the highlighted days when the doctor is available.</Text>
-            </View>
           </View>
-        </View>
 
         {/* Date Section - Professional Calendar */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Select Appointment Date</Text>
+          <Text style={styles.sectionTitle}>Choose a date</Text>
           <View style={styles.calendarContainer}>
             <Calendar
               markedDates={{
@@ -410,7 +411,7 @@ export default function DoctorDetailScreen({ route, navigation, currentUser }) {
                   ...acc,
                   [h.date]: { disabled: true, disableTouchEvent: true, marked: true, dotColor: '#FF3B30', textColor: '#D1D1D1' }
                 }), {}),
-                [selectedDate ? `${selectedDate.year}-${(selectedDate.month + 1).toString().padStart(2, '0')}-${selectedDate.date.toString().padStart(2, '0')}` : '']: { selected: true, selectedColor: '#0DB591' }
+                [selectedDate ? `${selectedDate.year}-${(selectedDate.month + 1).toString().padStart(2, '0')}-${selectedDate.date.toString().padStart(2, '0')}` : '']: { selected: true, selectedColor: colors.primary }
               }}
               minDate={toDateKey(addDays(settings.allowAnytimeBooking ? 0 : settings.minBookingDays || 0))}
               maxDate={toDateKey(addDays(17))}
@@ -431,17 +432,17 @@ export default function DoctorDetailScreen({ route, navigation, currentUser }) {
               }}
               theme={{
                 calendarBackground: '#FFFFFF',
-                textSectionTitleColor: '#1A4B44',
-                selectedDayBackgroundColor: '#0DB591',
+                textSectionTitleColor: colors.ink,
+                selectedDayBackgroundColor: colors.primary,
                 selectedDayTextColor: '#ffffff',
-                todayTextColor: '#0DB591',
+                todayTextColor: colors.primary,
                 dayTextColor: '#2d4150',
                 textDisabledColor: '#d9e1e8',
-                dotColor: '#0DB591',
+                dotColor: colors.primary,
                 selectedDotColor: '#ffffff',
-                arrowColor: '#0DB591',
-                monthTextColor: '#1A4B44',
-                indicatorColor: '#0DB591',
+                arrowColor: colors.primary,
+                monthTextColor: colors.ink,
+                indicatorColor: colors.primary,
                 textDayFontWeight: '500',
                 textMonthFontWeight: 'bold',
                 textDayHeaderFontWeight: 'bold',
@@ -454,7 +455,7 @@ export default function DoctorDetailScreen({ route, navigation, currentUser }) {
           </View>
           <View style={styles.calendarLegend}>
             <View style={styles.legendItem}>
-              <View style={[styles.legendDot, { backgroundColor: '#0DB591' }]} />
+              <View style={[styles.legendDot, { backgroundColor: colors.primary }]} />
               <Text style={styles.legendText}>Available</Text>
             </View>
             <View style={styles.legendItem}>
@@ -465,6 +466,7 @@ export default function DoctorDetailScreen({ route, navigation, currentUser }) {
         </View>
 
         {/* Time Section */}
+        <Text style={[styles.sectionTitle, { marginTop: 4 }]}>Choose a time</Text>
         <View style={styles.timeContainer}>
           {!selectedDate ? (
             <Text style={styles.noTimeText}>Please select a date to see available times.</Text>
@@ -483,24 +485,24 @@ export default function DoctorDetailScreen({ route, navigation, currentUser }) {
           )}
         </View>
         
-        <View style={{height: 160}} />
+        </View>
+        <View style={{ height: 170 }} />
       </ScrollView>
 
       {/* Bottom Bar */}
-      <View style={styles.bottomBar}>
-        <TouchableOpacity
-          style={[styles.bookButton, booking && { opacity: 0.6 }]}
+      <View style={[styles.bottomBar, { paddingBottom: tabBarHeight + 14 }]}>
+        <View style={{ flex: 1 }}>
+          <Text style={styles.bottomLabel}>{selectedDate ? `${selectedDate.day}, ${selectedDate.date}` : 'No date selected'}</Text>
+          <Text style={styles.bottomValue}>{selectedTime || 'Pick a time slot'}</Text>
+        </View>
+        <Button
+          title={editingAppointment ? 'Update' : 'Book now'}
+          icon="calendar"
           onPress={handleOpenForm}
-          disabled={booking}
-        >
-          {booking ? (
-            <ActivityIndicator color="#FFF" />
-          ) : (
-            <Text style={styles.bookButtonText}>
-              {editingAppointment ? 'Update Appointment' : 'Book Appointment'}
-            </Text>
-          )}
-        </TouchableOpacity>
+          loading={booking}
+          disabled={!selectedDate || !selectedTime}
+          style={{ minWidth: 150 }}
+        />
       </View>
 
       {/* Booking Form Modal */}
@@ -565,7 +567,7 @@ export default function DoctorDetailScreen({ route, navigation, currentUser }) {
                 onPress={() => setShowDatePicker(true)}
               >
                 <Text style={styles.datePickerText}>{toDateKey(formData.dob)}</Text>
-                <Ionicons name="calendar-outline" size={20} color="#0DB591" />
+                <Ionicons name="calendar-outline" size={20} color={colors.primary} />
               </TouchableOpacity>
               {errors.dob && <Text style={[styles.errorText, { marginTop: -10, marginBottom: 10 }]}>{errors.dob}</Text>}
               {showDatePicker && (
@@ -633,9 +635,13 @@ export default function DoctorDetailScreen({ route, navigation, currentUser }) {
               />
               {errors.reason && <Text style={styles.errorText}>{errors.reason}</Text>}
 
-              <TouchableOpacity style={styles.bookActionBtn} onPress={submitBookingForm} disabled={booking}>
-                {booking ? <ActivityIndicator color="#FFF" /> : <Text style={styles.bookActionBtnText}>Book Appointment</Text>}
-              </TouchableOpacity>
+              <Button
+                title={editingAppointment ? 'Confirm update' : 'Confirm booking'}
+                icon="checkmark-circle"
+                onPress={submitBookingForm}
+                loading={booking}
+                style={{ marginTop: 8 }}
+              />
             </ScrollView>
 
             <TouchableOpacity style={styles.closeModalBtn} onPress={() => setFormVisible(false)}>
@@ -644,424 +650,97 @@ export default function DoctorDetailScreen({ route, navigation, currentUser }) {
           </View>
         </KeyboardAvoidingView>
       </Modal>
-    </SafeAreaView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#FAFAFA',
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingTop: 40,
-    paddingBottom: 15,
-    backgroundColor: '#FAFAFA',
-  },
-  iconButton: {
-    padding: 5,
-  },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#333',
-  },
-  content: {
-    paddingHorizontal: 20,
-  },
-  profileSection: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#FFF',
-    padding: 15,
-    borderRadius: 16,
-    marginBottom: 25,
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOpacity: 0.05,
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 8,
-  },
-  profileImage: {
-    width: 70,
-    height: 70,
-    borderRadius: 12,
-    marginRight: 15,
-  },
-  profileInfo: {
-    flex: 1,
-    justifyContent: 'center',
-  },
-  doctorName: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 4,
-  },
-  specialization: {
-    fontSize: 14,
-    color: 'gray',
-    marginBottom: 10,
-  },
-  statsRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  statItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginRight: 15,
-  },
-  statIconContainer: {
-    backgroundColor: '#E8F5F1',
-    padding: 4,
-    borderRadius: 8,
-    marginRight: 6,
-  },
-  statText: {
-    fontSize: 12,
-    color: '#333',
-    fontWeight: '500',
-  },
-  section: {
-    marginBottom: 25,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 10,
-  },
-  aboutText: {
-    fontSize: 14,
-    color: 'gray',
-    lineHeight: 22,
-  },
-  readMore: {
-    color: '#0DB591',
-    fontWeight: 'bold',
-  },
-  datesContainer: {
-    marginBottom: 25,
-    marginHorizontal: -20,
-    paddingHorizontal: 20,
-  },
-  dateCard: {
-    width: 60,
-    height: 75,
-    borderRadius: 16,
-    backgroundColor: '#FFF',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 15,
-    borderWidth: 1,
-    borderColor: '#F0F0F0',
-  },
-  dateCardSelected: {
-    backgroundColor: '#0DB591',
-    borderColor: '#0DB591',
-  },
-  dateDay: {
-    fontSize: 12,
-    color: 'gray',
-    marginBottom: 5,
-  },
-  dateNum: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#333',
-  },
-  textSelected: {
-    color: '#FFF',
-  },
-  timeContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-  },
-  timeCard: {
-    width: '31%',
-    backgroundColor: '#FFF',
-    paddingVertical: 12,
-    borderRadius: 12,
-    alignItems: 'center',
-    marginBottom: 15,
-    borderWidth: 1,
-    borderColor: '#F0F0F0',
-  },
-  timeCardSelected: {
-    backgroundColor: '#0DB591',
-    borderColor: '#0DB591',
-  },
-  timeText: {
-    fontSize: 14,
-    color: '#333',
-    fontWeight: '500',
-  },
-  noTimeText: {
-    fontSize: 14,
-    color: '#999',
-    textAlign: 'center',
-    width: '100%',
-    paddingVertical: 20,
-  },
-  bottomBar: {
-    position: 'absolute',
-    bottom: Platform.OS === 'ios' ? 85 : 65, // Avoid overlapping with tab navigator
-    left: 0,
-    right: 0,
-    backgroundColor: '#FFF',
-    flexDirection: 'row',
-    paddingHorizontal: 20,
-    paddingVertical: 15,
-    borderTopWidth: 1,
-    borderTopColor: '#F0F0F0',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    elevation: 5,
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowRadius: 5,
-    shadowOffset: { width: 0, height: -3 },
-  },
-  chatButton: {
-    width: 50,
-    height: 50,
-    borderRadius: 16,
-    backgroundColor: '#E8F5F1',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 15,
-  },
-  bookButton: {
-    flex: 1,
-    backgroundColor: '#0DB591',
-    height: 50,
-    borderRadius: 16,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  bookButtonText: {
-    color: '#FFF',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  aboutContent: {
-    gap: 12,
-  },
-  aboutItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-  },
-  availabilityGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 10,
-  },
-  availabilityItem: {
-    flex: 1,
-    minWidth: '45%',
-    backgroundColor: '#F0F8F5',
-    borderRadius: 10,
-    padding: 12,
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#E8F3F0',
-  },
-  dayName: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: '#1A4B44',
-    marginBottom: 4,
-  },
-  dayTime: {
-    fontSize: 12,
-    color: '#0DB591',
-    fontWeight: '600',
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    justifyContent: 'flex-end',
-  },
-  modalContent: {
-    backgroundColor: '#FFF',
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    padding: 20,
-    maxHeight: '80%',
-  },
-  modalTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 15,
-    color: '#333',
-    textAlign: 'center',
-  },
-  label: {
-    fontSize: 14,
-    color: '#555',
-    marginBottom: 5,
-    fontWeight: '600',
-  },
-  input: {
-    backgroundColor: '#F5F5F5',
-    borderRadius: 10,
-    padding: 12,
-    marginBottom: 15,
-    fontSize: 16,
-    color: '#333',
-  },
-  modalHeaderInfo: {
-    backgroundColor: '#F0F8F5',
-    padding: 15,
-    borderRadius: 12,
-    marginBottom: 15,
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#E8F3F0',
-  },
-  modalDoctorName: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#1A4B44',
-  },
-  modalDoctorSpec: {
-    fontSize: 14,
-    color: '#0DB591',
-    marginBottom: 5,
-  },
-  modalDateTime: {
-    fontSize: 14,
-    color: '#555',
-    fontWeight: '600',
-  },
-  row: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  halfWidth: {
-    width: '48%',
-  },
-  datePickerBtn: {
-    backgroundColor: '#F5F5F5',
-    borderRadius: 10,
-    padding: 12,
-    marginBottom: 15,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  datePickerText: {
-    fontSize: 16,
-    color: '#333',
-  },
-  genderRow: {
-    flexDirection: 'row',
-    marginBottom: 15,
-    gap: 10,
-  },
-  genderBtn: {
-    flex: 1,
-    padding: 12,
-    backgroundColor: '#F5F5F5',
-    borderRadius: 10,
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: 'transparent',
-  },
-  genderBtnActive: {
-    backgroundColor: '#E8F5F1',
-    borderColor: '#0DB591',
-  },
-  genderBtnText: {
-    fontSize: 16,
-    color: '#555',
-    fontWeight: '500',
-  },
-  genderBtnTextActive: {
-    color: '#0DB591',
-    fontWeight: 'bold',
-  },
-  bookActionBtn: {
-    backgroundColor: '#0DB591',
-    padding: 15,
-    borderRadius: 12,
-    alignItems: 'center',
-    marginTop: 10,
-    marginBottom: 20,
-  },
-  bookActionBtnText: {
-    color: '#FFF',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  closeModalBtn: {
-    position: 'absolute',
-    top: 15,
-    right: 15,
-    padding: 5,
-    backgroundColor: '#FFF',
-    borderRadius: 20,
-  },
+  container: { flex: 1, backgroundColor: colors.background },
+  content: { flex: 1 },
+  body: { paddingHorizontal: 20 },
 
-  // ── New Enhancements
-  sectionHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 },
-  availableBadge: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#E8F5E9', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 12, gap: 6 },
-  pulseDot: { width: 6, height: 6, borderRadius: 3, backgroundColor: '#4CAF50' },
-  availableText: { fontSize: 11, fontWeight: '700', color: '#2E7D32' },
-  adviceBox: { backgroundColor: '#F0F9FF', padding: 15, borderRadius: 16, gap: 12, borderLeftWidth: 4, borderLeftColor: '#0DB591' },
-  adviceItem: { flexDirection: 'row', gap: 10, alignItems: 'center' },
-  adviceText: { fontSize: 13, color: '#0369A1', flex: 1, lineHeight: 18 },
-  dateCardDisabled: { backgroundColor: '#F5F5F5', borderColor: '#EEE' },
-  textDisabled: { color: '#CCC' },
-  availableDot: { position: 'absolute', bottom: 8, width: 4, height: 4, borderRadius: 2, backgroundColor: '#0DB591' },
-  calendarContainer: {
-    backgroundColor: '#FFF',
-    borderRadius: 16,
-    overflow: 'hidden',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 10,
-    elevation: 3,
-    marginTop: 10,
+  // hero
+  header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 18 },
+  iconButton: { width: 40, height: 40, borderRadius: 12, backgroundColor: 'rgba(255,255,255,0.16)', alignItems: 'center', justifyContent: 'center' },
+  headerTitle: { color: '#fff', fontSize: 16, fontWeight: '700' },
+  profileSection: { flexDirection: 'row', alignItems: 'center' },
+  profileImage: { borderWidth: 3, borderColor: 'rgba(255,255,255,0.45)' },
+  profileInfo: { flex: 1, marginLeft: 16 },
+  doctorName: { color: '#fff', fontSize: 22, fontWeight: '800', letterSpacing: -0.3 },
+  specialization: { color: 'rgba(255,255,255,0.85)', fontSize: 14, marginTop: 3, fontWeight: '600' },
+  verified: { flexDirection: 'row', alignItems: 'center', gap: 5, alignSelf: 'flex-start', backgroundColor: 'rgba(255,255,255,0.18)', borderRadius: 999, paddingHorizontal: 10, paddingVertical: 4, marginTop: 10 },
+  verifiedText: { color: '#fff', fontSize: 11, fontWeight: '700' },
+
+  statsRow: { flexDirection: 'row', backgroundColor: colors.surface, marginHorizontal: 20, marginTop: -44, borderRadius: radius.lg, paddingVertical: 14, ...shadow.card },
+  statItem: { flex: 1, alignItems: 'center', paddingHorizontal: 4 },
+  statIconContainer: { width: 34, height: 34, borderRadius: 11, alignItems: 'center', justifyContent: 'center', marginBottom: 6 },
+  statText: { fontSize: 16, fontWeight: '800', color: colors.ink },
+  statLabel: { fontSize: 11, color: colors.muted, marginTop: 1 },
+
+  // sections
+  section: { marginTop: 24 },
+  sectionHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 },
+  sectionTitle: { fontSize: 18, fontWeight: '800', color: colors.ink, marginBottom: 12 },
+  aboutContent: { backgroundColor: colors.surface, borderRadius: radius.lg, padding: 14, gap: 14, ...shadow.soft },
+  aboutItem: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  aboutIcon: { width: 36, height: 36, borderRadius: 11, backgroundColor: colors.primarySoft, alignItems: 'center', justifyContent: 'center' },
+  aboutLabel: { fontSize: 11, color: colors.muted, fontWeight: '700', letterSpacing: 0.3 },
+  aboutText: { fontSize: 14, color: colors.ink, fontWeight: '600', marginTop: 1 },
+
+  availableBadge: { flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: colors.successSoft, paddingHorizontal: 10, paddingVertical: 5, borderRadius: 999, marginBottom: 12 },
+  pulseDot: { width: 7, height: 7, borderRadius: 4, backgroundColor: colors.success },
+  availableText: { fontSize: 11, fontWeight: '700', color: '#047857' },
+  availabilityGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+  availabilityItem: { width: '31.5%', backgroundColor: colors.surface, borderRadius: radius.md, paddingVertical: 10, alignItems: 'center', borderWidth: 1, borderColor: colors.border },
+  dayName: { fontSize: 13, fontWeight: '800', color: colors.primary },
+  dayTime: { fontSize: 11, color: colors.body, textAlign: 'center', marginTop: 3, lineHeight: 15 },
+
+  adviceBox: { backgroundColor: colors.primarySoft, borderRadius: radius.lg, padding: 14, gap: 10, marginTop: 24 },
+  adviceItem: { flexDirection: 'row', alignItems: 'flex-start', gap: 10 },
+  adviceText: { flex: 1, fontSize: 13, color: colors.ink, lineHeight: 19 },
+
+  calendarContainer: { backgroundColor: colors.surface, borderRadius: radius.lg, padding: 8, overflow: 'hidden', ...shadow.soft },
+  calendar: { borderRadius: radius.lg },
+  calendarLegend: { flexDirection: 'row', gap: 18, marginTop: 10, marginBottom: 20, marginLeft: 4 },
+  legendItem: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  legendDot: { width: 8, height: 8, borderRadius: 4 },
+  legendText: { fontSize: 12, color: colors.body },
+
+  timeContainer: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
+  timeCard: { width: '31%', height: 46, borderRadius: radius.md, backgroundColor: colors.surface, borderWidth: 1.5, borderColor: colors.border, alignItems: 'center', justifyContent: 'center' },
+  timeCardSelected: { backgroundColor: colors.primary, borderColor: colors.primary, ...shadow.button },
+  timeText: { fontSize: 13, fontWeight: '700', color: colors.ink },
+  textSelected: { color: '#fff' },
+  noTimeText: { fontSize: 13, color: colors.body, backgroundColor: colors.surface, borderRadius: radius.md, padding: 14, width: '100%', textAlign: 'center' },
+
+  bottomBar: {
+    position: 'absolute', left: 0, right: 0, bottom: 0, flexDirection: 'row', alignItems: 'center', gap: 12,
+    backgroundColor: colors.surface, paddingHorizontal: 20, paddingTop: 14,
+    borderTopLeftRadius: 24, borderTopRightRadius: 24, ...shadow.card,
   },
-  calendar: {
-    borderRadius: 16,
-  },
-  calendarLegend: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    gap: 20,
-    marginTop: 12,
-  },
-  legendItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-  },
-  legendDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-  },
-  legendText: {
-    fontSize: 12,
-    color: '#666',
-  },
-  errorText: {
-    color: '#FF3B30',
-    fontSize: 12,
-    marginBottom: 10,
-    marginTop: -5,
-  },
-  inputError: {
-    borderColor: '#FF3B30',
-  },
+  bottomLabel: { fontSize: 12, color: colors.muted, fontWeight: '600' },
+  bottomValue: { fontSize: 16, color: colors.ink, fontWeight: '800', marginTop: 2 },
+
+  // booking modal
+  modalOverlay: { flex: 1, backgroundColor: 'rgba(6,30,34,0.55)', justifyContent: 'flex-end' },
+  modalContent: { backgroundColor: colors.surface, borderTopLeftRadius: 28, borderTopRightRadius: 28, padding: 20, paddingTop: 22, maxHeight: '92%' },
+  modalHeaderInfo: { backgroundColor: colors.primarySoft, borderRadius: radius.lg, padding: 14, marginBottom: 16, marginRight: 44 },
+  modalDoctorName: { fontSize: 17, fontWeight: '800', color: colors.ink },
+  modalDoctorSpec: { fontSize: 13, color: colors.primary, fontWeight: '600', marginTop: 2 },
+  modalDateTime: { fontSize: 13, color: colors.ink, fontWeight: '700', marginTop: 8 },
+  modalTitle: { fontSize: 18, fontWeight: '800', color: colors.ink, marginBottom: 12 },
+  closeModalBtn: { position: 'absolute', top: 20, right: 18, width: 38, height: 38, borderRadius: 12, backgroundColor: colors.surfaceAlt, alignItems: 'center', justifyContent: 'center' },
+  row: { flexDirection: 'row', gap: 12 },
+  halfWidth: { flex: 1 },
+  label: { fontSize: 12, fontWeight: '700', color: colors.body, marginBottom: 6, letterSpacing: 0.3 },
+  input: { backgroundColor: colors.surfaceAlt, borderWidth: 1.5, borderColor: colors.border, borderRadius: radius.md, height: 50, paddingHorizontal: 14, fontSize: 14, color: colors.ink, marginBottom: 14, outlineWidth: 0 },
+  inputError: { borderColor: colors.danger, backgroundColor: '#FFF7F7' },
+  errorText: { color: colors.danger, fontSize: 12, marginTop: -10, marginBottom: 10 },
+  datePickerBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: colors.surfaceAlt, borderWidth: 1.5, borderColor: colors.border, borderRadius: radius.md, height: 50, paddingHorizontal: 14, marginBottom: 14 },
+  datePickerText: { fontSize: 14, color: colors.ink },
+  genderRow: { flexDirection: 'row', gap: 10, marginBottom: 14 },
+  genderBtn: { flex: 1, height: 46, borderRadius: radius.md, borderWidth: 1.5, borderColor: colors.border, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.surfaceAlt },
+  genderBtnActive: { backgroundColor: colors.primary, borderColor: colors.primary },
+  genderBtnText: { fontSize: 14, fontWeight: '700', color: colors.body },
+  genderBtnTextActive: { color: '#fff' },
 });

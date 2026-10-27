@@ -269,7 +269,7 @@ export default function EditDoctorScreen({ route, navigation }) {
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-          <Ionicons name="chevron-back" size={20} color="#1A4B44" />
+          <Ionicons name="chevron-back" size={20} color="#0F2A2E" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>
           {isNewDoctor ? 'Create Doctor' : 'Edit Doctor'}
@@ -296,7 +296,7 @@ export default function EditDoctorScreen({ route, navigation }) {
               />
             ) : (
               <View style={styles.photoPlaceholder}>
-                <Ionicons name="camera" size={32} color="#0DB591" />
+                <Ionicons name="camera" size={32} color="#0C6875" />
                 <Text style={styles.photoText}>Add Photo</Text>
               </View>
             )}
@@ -447,14 +447,14 @@ export default function EditDoctorScreen({ route, navigation }) {
                       }}
                     >
                       <Text style={styles.dayText}>{slot.day}</Text>
-                      <Ionicons name="chevron-down" size={16} color="#0DB591" />
+                      <Ionicons name="chevron-down" size={16} color="#0C6875" />
                     </TouchableOpacity>
 
                     <TouchableOpacity
                       style={styles.availabilityTime}
                       onPress={() => setShowTimePickerFor({ type: 'startTime', index })}
                     >
-                      <Ionicons name="time" size={16} color="#0DB591" />
+                      <Ionicons name="time" size={16} color="#0C6875" />
                       <Text style={styles.timeText}>{slot.startTime}</Text>
                     </TouchableOpacity>
 
@@ -464,7 +464,7 @@ export default function EditDoctorScreen({ route, navigation }) {
                       style={styles.availabilityTime}
                       onPress={() => setShowTimePickerFor({ type: 'endTime', index })}
                     >
-                      <Ionicons name="time" size={16} color="#0DB591" />
+                      <Ionicons name="time" size={16} color="#0C6875" />
                       <Text style={styles.timeText}>{slot.endTime}</Text>
                     </TouchableOpacity>
 
@@ -483,7 +483,7 @@ export default function EditDoctorScreen({ route, navigation }) {
               style={styles.addSlotButton}
               onPress={handleAddAvailabilitySlot}
             >
-              <Ionicons name="add-circle" size={20} color="#0DB591" />
+              <Ionicons name="add-circle" size={20} color="#0C6875" />
               <Text style={styles.addSlotText}>Add Time Slot</Text>
             </TouchableOpacity>
 
@@ -604,7 +604,7 @@ export default function EditDoctorScreen({ route, navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F2FAF8',
+    backgroundColor: '#F3F7F8',
   },
   header: {
     flexDirection: 'row',
@@ -627,7 +627,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#1A4B44',
+    color: '#0F2A2E',
   },
   content: {
     flex: 1,
@@ -647,7 +647,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     backgroundColor: '#FFFFFF',
     borderWidth: 2,
-    borderColor: '#0DB591',
+    borderColor: '#0C6875',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -662,7 +662,7 @@ const styles = StyleSheet.create({
   photoText: {
     marginTop: 8,
     fontSize: 12,
-    color: '#0DB591',
+    color: '#0C6875',
     fontWeight: '600',
   },
   section: {
@@ -671,12 +671,12 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#1A4B44',
+    color: '#0F2A2E',
     marginBottom: 4,
   },
   sectionSubtitle: {
     fontSize: 12,
-    color: '#A3B5B3',
+    color: '#8AA0A3',
     marginBottom: 16,
   },
   inputGroup: {
@@ -685,7 +685,7 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#1A4B44',
+    color: '#0F2A2E',
     marginBottom: 8,
   },
   input: {
@@ -696,7 +696,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingVertical: 12,
     fontSize: 14,
-    color: '#1A4B44',
+    color: '#0F2A2E',
   },
   inputError: {
     borderColor: '#E74C3C',
@@ -707,7 +707,7 @@ const styles = StyleSheet.create({
     marginTop: 6,
   },
   submitButton: {
-    backgroundColor: '#0DB591',
+    backgroundColor: '#0C6875',
     borderRadius: 10,
     paddingVertical: 14,
     justifyContent: 'center',
@@ -769,7 +769,7 @@ const styles = StyleSheet.create({
   dayText: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#1A4B44',
+    color: '#0F2A2E',
   },
   availabilityTime: {
     flex: 0.8,
@@ -785,7 +785,7 @@ const styles = StyleSheet.create({
   timeText: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#0DB591',
+    color: '#0C6875',
   },
   timeSeparator: {
     fontSize: 12,
@@ -804,14 +804,14 @@ const styles = StyleSheet.create({
     gap: 8,
     paddingVertical: 12,
     borderWidth: 1,
-    borderColor: '#0DB591',
+    borderColor: '#0C6875',
     borderRadius: 10,
     marginTop: 12,
   },
   addSlotText: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#0DB591',
+    color: '#0C6875',
   },
   // Modal styles
   modalOverlay: {
@@ -830,7 +830,7 @@ const styles = StyleSheet.create({
   modalTitle: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#1A4B44',
+    color: '#0F2A2E',
   },
   modalOption: {
     paddingHorizontal: 16,
@@ -847,6 +847,6 @@ const styles = StyleSheet.create({
   },
   modalOptionTextSelected: {
     fontWeight: '700',
-    color: '#0DB591',
+    color: '#0C6875',
   },
 });

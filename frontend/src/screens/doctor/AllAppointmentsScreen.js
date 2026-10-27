@@ -22,7 +22,7 @@ const getStatusColor = (status) => {
     case 'pending':
       return '#FF9500';
     case 'confirmed':
-      return '#0077B6';
+      return '#0C6875';
     case 'completed':
       return '#34C759';
     case 'cancelled':
@@ -148,7 +148,7 @@ export default function AllAppointmentsScreen({ currentUser, navigation }) {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#0077B6" />
+          <ActivityIndicator size="large" color="#0C6875" />
         </View>
       </SafeAreaView>
     );
@@ -161,7 +161,7 @@ export default function AllAppointmentsScreen({ currentUser, navigation }) {
           style={styles.backButton}
           onPress={() => navigation.goBack()}
         >
-          <Ionicons name="chevron-back" size={24} color="#0077B6" />
+          <Ionicons name="chevron-back" size={24} color="#0C6875" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>All Appointments</Text>
         <View style={styles.placeholder} />
@@ -301,7 +301,7 @@ export default function AllAppointmentsScreen({ currentUser, navigation }) {
                     style={styles.rescheduleBtn}
                     onPress={() => openRescheduleModal(appointment)}
                   >
-                    <Ionicons name="calendar" size={14} color="#0077B6" />
+                    <Ionicons name="calendar" size={14} color="#0C6875" />
                     <Text style={styles.rescheduleBtnText}>Request Reschedule</Text>
                   </TouchableOpacity>
                 )}
@@ -428,7 +428,7 @@ export default function AllAppointmentsScreen({ currentUser, navigation }) {
               <ScrollView contentContainerStyle={{ padding: 20 }}>
                 <View style={{ marginBottom: 20, flexDirection: 'row', alignItems: 'center', gap: 15 }}>
                   <View style={{ width: 60, height: 60, borderRadius: 30, backgroundColor: '#E3F2FD', justifyContent: 'center', alignItems: 'center' }}>
-                    <Text style={{ fontSize: 24, fontWeight: 'bold', color: '#0077B6' }}>
+                    <Text style={{ fontSize: 24, fontWeight: 'bold', color: '#0C6875' }}>
                       {selectedAppointment.patientName?.charAt(0).toUpperCase()}
                     </Text>
                   </View>
@@ -468,7 +468,7 @@ export default function AllAppointmentsScreen({ currentUser, navigation }) {
                 )}
 
                 <TouchableOpacity
-                  style={[styles.prescriptionBtn, { width: '100%', backgroundColor: '#0077B6' }]}
+                  style={[styles.prescriptionBtn, { width: '100%', backgroundColor: '#0C6875' }]}
                   onPress={() => {
                     setIsPatientModalVisible(false);
                     navigation.navigate('DoctorPatientRecords', { 
@@ -570,8 +570,8 @@ const styles = StyleSheet.create({
     borderColor: '#E0E0E0',
   },
   filterButtonActive: {
-    backgroundColor: '#0077B6',
-    borderColor: '#0077B6',
+    backgroundColor: '#0C6875',
+    borderColor: '#0C6875',
   },
   filterButtonText: {
     fontSize: 12,
@@ -611,7 +611,7 @@ const styles = StyleSheet.create({
     padding: 14,
     marginBottom: 10,
     borderLeftWidth: 4,
-    borderLeftColor: '#0077B6',
+    borderLeftColor: '#0C6875',
     shadowColor: '#000',
     shadowOpacity: 0.05,
     shadowOffset: { width: 0, height: 2 },
@@ -661,7 +661,7 @@ const styles = StyleSheet.create({
   descriptionLabel: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#0077B6',
+    color: '#0C6875',
     marginBottom: 4,
   },
   descriptionText: {
@@ -678,7 +678,7 @@ const styles = StyleSheet.create({
   notesLabel: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#0077B6',
+    color: '#0C6875',
     marginBottom: 4,
   },
   notesText: {
@@ -702,11 +702,11 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#0077B6',
+    borderColor: '#0C6875',
     backgroundColor: '#F0F8FF',
   },
   rescheduleBtnText: {
-    color: '#0077B6',
+    color: '#0C6875',
     fontSize: 13,
     fontWeight: '600',
   },
@@ -726,7 +726,7 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   confirmBtn: {
-    backgroundColor: '#0077B6',
+    backgroundColor: '#0C6875',
   },
   cancelBtn: {
     backgroundColor: '#FF3B30',
@@ -830,7 +830,7 @@ const styles = StyleSheet.create({
     textAlignVertical: 'top',
   },
   submitBtn: {
-    backgroundColor: '#0077B6',
+    backgroundColor: '#0C6875',
     borderRadius: 8,
     paddingVertical: 14,
     alignItems: 'center',
@@ -858,7 +858,7 @@ const styles = StyleSheet.create({
     borderRadius: 30,
   },
   modalAvatarPlaceholder: {
-    backgroundColor: '#0077B6',
+    backgroundColor: '#0C6875',
     justifyContent: 'center',
     alignItems: 'center',
   },

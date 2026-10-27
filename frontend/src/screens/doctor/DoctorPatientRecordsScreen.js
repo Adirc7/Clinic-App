@@ -55,7 +55,7 @@ export default function DoctorPatientRecordsScreen({ route, navigation }) {
 
       {loading ? (
         <View style={styles.center}>
-          <ActivityIndicator size="large" color="#0DB591" />
+          <ActivityIndicator size="large" color="#0C6875" />
         </View>
       ) : (
         <ScrollView style={styles.list} contentContainerStyle={{ padding: 16 }}>
@@ -101,7 +101,7 @@ export default function DoctorPatientRecordsScreen({ route, navigation }) {
                   onPress={() => handleViewDocument(record.fileUrl)}
                 >
                   <Text style={styles.viewBtnText}>View Document</Text>
-                  <Ionicons name="arrow-forward" size={16} color="#0DB591" />
+                  <Ionicons name="arrow-forward" size={16} color="#0C6875" />
                 </TouchableOpacity>
               </View>
             ))
@@ -144,8 +144,8 @@ const styles = StyleSheet.create({
   cardFooter: { flexDirection: 'row', flexWrap: 'wrap', gap: 16, marginBottom: 16, paddingBottom: 16, borderBottomWidth: 1, borderBottomColor: '#F0F0F0' },
   metaInfo: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   metaText: { fontSize: 13, color: '#666' },
-  viewBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, backgroundColor: '#E8F8F5', paddingVertical: 12, borderRadius: 8 },
-  viewBtnText: { fontSize: 14, fontWeight: '700', color: '#0DB591' },
+  viewBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, backgroundColor: '#E7F1F2', paddingVertical: 12, borderRadius: 8 },
+  viewBtnText: { fontSize: 14, fontWeight: '700', color: '#0C6875' },
   fab: {
     position: 'absolute',
     bottom: 24,
@@ -153,10 +153,10 @@ const styles = StyleSheet.create({
     width: 60,
     height: 60,
     borderRadius: 30,
-    backgroundColor: '#0DB591',
+    backgroundColor: '#0C6875',
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: '#0DB591',
+    shadowColor: '#0C6875',
     shadowOpacity: 0.4,
     shadowOffset: { width: 0, height: 4 },
     shadowRadius: 8,

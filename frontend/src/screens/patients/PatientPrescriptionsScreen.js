@@ -74,7 +74,7 @@ export default function PatientPrescriptionsScreen({ navigation }) {
 
       {loading ? (
         <View style={styles.center}>
-          <ActivityIndicator size="large" color="#0DB591" />
+          <ActivityIndicator size="large" color="#0C6875" />
         </View>
       ) : (
         <ScrollView
@@ -143,8 +143,8 @@ const styles = StyleSheet.create({
   card: { backgroundColor: '#FFF', padding: 16, borderRadius: 16, marginBottom: 12, shadowColor: '#000', shadowOpacity: 0.05, shadowOffset: { width: 0, height: 2 }, shadowRadius: 6, elevation: 2 },
   cardHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 15 },
   titleRow: { flexDirection: 'row', alignItems: 'center', flex: 1, gap: 12 },
-  rxIcon: { width: 40, height: 40, borderRadius: 20, backgroundColor: '#E8F8F5', justifyContent: 'center', alignItems: 'center' },
-  rxIconText: { color: '#0DB591', fontWeight: 'bold', fontSize: 18, fontStyle: 'italic' },
+  rxIcon: { width: 40, height: 40, borderRadius: 20, backgroundColor: '#E7F1F2', justifyContent: 'center', alignItems: 'center' },
+  rxIconText: { color: '#0C6875', fontWeight: 'bold', fontSize: 18, fontStyle: 'italic' },
   cardTitle: { fontSize: 16, fontWeight: '700', color: '#1A2B4A' },
   cardSubtitle: { fontSize: 13, color: '#666', marginTop: 2 },
   cardFooter: { flexDirection: 'row', gap: 20, paddingTop: 12, borderTopWidth: 1, borderTopColor: '#F0F0F0' },

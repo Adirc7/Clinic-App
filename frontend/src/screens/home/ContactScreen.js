@@ -28,7 +28,7 @@ export default function ContactScreen({ navigation }) {
   };
 
   const highlights = [
-    { icon: 'time-outline', color: '#0DB591', title: '24/7 Availability', desc: '24/7 support for hospital enquiries and patient assistance.' },
+    { icon: 'time-outline', color: '#0C6875', title: '24/7 Availability', desc: '24/7 support for hospital enquiries and patient assistance.' },
     { icon: 'shield-checkmark-outline', color: '#007AFF', title: 'Trusted Healthcare Legacy', desc: 'A long-standing reputation for dependable private healthcare in Sri Lanka.' },
     { icon: 'people-outline', color: '#FF9800', title: 'Professional Support', desc: 'Friendly assistance for enquiries, appointments, and patient guidance.' },
     { icon: 'flash-outline', color: '#9C27B0', title: 'Prompt Response', desc: 'Designed to help patients and families connect with the right team quickly.' },
@@ -39,7 +39,7 @@ export default function ContactScreen({ navigation }) {
       {/* Header */}
       <View style={s.topBar}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={s.backBtn}>
-          <Ionicons name="arrow-back" size={22} color="#0A6B5B" />
+          <Ionicons name="arrow-back" size={22} color="#0C6875" />
         </TouchableOpacity>
         <Text style={s.topBarTitle}>Contact Us</Text>
         <View style={{ width: 36 }} />
@@ -61,7 +61,7 @@ export default function ContactScreen({ navigation }) {
 
         {/* Intro card */}
         <View style={s.introCard}>
-          <MaterialCommunityIcons name="hospital-building" size={30} color="#0DB591" style={{ marginBottom: 10 }} />
+          <MaterialCommunityIcons name="hospital-building" size={30} color="#0C6875" style={{ marginBottom: 10 }} />
           <Text style={s.introTitle}>Patient & Visitor Enquiries</Text>
           <Text style={s.introText}>Contact Nawaloka Hospitals PLC for general enquiries, appointments, channeling support, and healthcare assistance. Our team is ready to guide patients, visitors, and families with professionalism and care.</Text>
         </View>
@@ -70,8 +70,8 @@ export default function ContactScreen({ navigation }) {
         <View style={s.infoGrid}>
           {/* Address */}
           <View style={s.infoCard}>
-            <View style={[s.infoIcon, { backgroundColor: '#E8F5F1' }]}>
-              <Ionicons name="location-outline" size={20} color="#0DB591" />
+            <View style={[s.infoIcon, { backgroundColor: '#E7F1F2' }]}>
+              <Ionicons name="location-outline" size={20} color="#0C6875" />
             </View>
             <Text style={s.infoCardTitle}>Hospital Address</Text>
             <Text style={s.infoCardText}>Nawaloka Hospitals PLC,{'\n'}23, Deshamanya H. K.{'\n'}Dharmadasa Mawatha,{'\n'}Colombo 02, Sri Lanka.</Text>
@@ -105,7 +105,7 @@ export default function ContactScreen({ navigation }) {
           </View>
 
           {/* Availability */}
-          <View style={[s.infoCard, { backgroundColor: '#0DB591' }]}>
+          <View style={[s.infoCard, { backgroundColor: '#0C6875' }]}>
             <View style={[s.infoIcon, { backgroundColor: 'rgba(255,255,255,0.25)' }]}>
               <Ionicons name="time-outline" size={20} color="#fff" />
             </View>
@@ -131,7 +131,7 @@ export default function ContactScreen({ navigation }) {
         {/* Enquiry Form */}
         <View style={s.formCard}>
           <View style={s.formBadge}>
-            <Ionicons name="lock-closed-outline" size={12} color="#0DB591" />
+            <Ionicons name="lock-closed-outline" size={12} color="#0C6875" />
             <Text style={s.formBadgeText}>Secure & Easy</Text>
           </View>
           <Text style={s.formTitle}>Online Enquiry Form</Text>
@@ -193,15 +193,15 @@ const s = StyleSheet.create({
   scroll: { paddingBottom: 30 },
 
   topBar: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingVertical: 12, backgroundColor: '#fff', borderBottomWidth: 1, borderBottomColor: '#f0f0f0' },
-  backBtn: { width: 36, height: 36, borderRadius: 12, backgroundColor: '#F0FAF7', alignItems: 'center', justifyContent: 'center' },
+  backBtn: { width: 36, height: 36, borderRadius: 12, backgroundColor: '#E7F1F2', alignItems: 'center', justifyContent: 'center' },
   topBarTitle: { fontSize: 16, fontWeight: '800', color: '#0A2E2A' },
 
   heroBanner: { backgroundColor: '#0A2E2A', padding: 24, paddingTop: 28 },
-  heroTag: { fontSize: 11, color: '#0DB591', fontWeight: '700', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 10 },
+  heroTag: { fontSize: 11, color: '#0C6875', fontWeight: '700', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 10 },
   heroTitle: { fontSize: 15, color: 'rgba(255,255,255,0.85)', lineHeight: 23 },
 
   sectionHead: { paddingHorizontal: 18, paddingTop: 24, paddingBottom: 6 },
-  sectionLabel: { fontSize: 11, color: '#0DB591', fontWeight: '700', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 6 },
+  sectionLabel: { fontSize: 11, color: '#0C6875', fontWeight: '700', textTransform: 'uppercase', letterSpacing: 1, marginBottom: 6 },
   sectionTitle: { fontSize: 22, fontWeight: '900', color: '#0A2E2A', lineHeight: 30 },
 
   introCard: { margin: 16, backgroundColor: '#fff', borderRadius: 18, padding: 18, elevation: 2, shadowColor: '#000', shadowOpacity: 0.05, shadowOffset: { width: 0, height: 2 }, shadowRadius: 8 },
@@ -214,7 +214,7 @@ const s = StyleSheet.create({
   infoCardTitle: { fontSize: 13, fontWeight: '800', color: '#1A2E2A', marginBottom: 8 },
   infoCardText: { fontSize: 13, color: '#666', lineHeight: 20 },
   infoLabel: { fontSize: 11, color: '#999', fontWeight: '600', marginBottom: 2 },
-  infoPhone: { fontSize: 15, fontWeight: '800', color: '#0DB591' },
+  infoPhone: { fontSize: 15, fontWeight: '800', color: '#0C6875' },
 
   highlightRow: { flexDirection: 'row', alignItems: 'flex-start', paddingHorizontal: 16, marginBottom: 12, gap: 14 },
   highlightIcon: { width: 44, height: 44, borderRadius: 14, alignItems: 'center', justifyContent: 'center', marginTop: 2 },
@@ -222,14 +222,14 @@ const s = StyleSheet.create({
   highlightDesc: { fontSize: 12.5, color: '#666', lineHeight: 19 },
 
   formCard: { margin: 16, backgroundColor: '#fff', borderRadius: 20, padding: 20, elevation: 3, shadowColor: '#000', shadowOpacity: 0.06, shadowOffset: { width: 0, height: 3 }, shadowRadius: 10 },
-  formBadge: { flexDirection: 'row', alignItems: 'center', gap: 5, backgroundColor: '#E8F5F1', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 20, alignSelf: 'flex-start', marginBottom: 14 },
-  formBadgeText: { fontSize: 11, color: '#0DB591', fontWeight: '700' },
+  formBadge: { flexDirection: 'row', alignItems: 'center', gap: 5, backgroundColor: '#E7F1F2', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 20, alignSelf: 'flex-start', marginBottom: 14 },
+  formBadgeText: { fontSize: 11, color: '#0C6875', fontWeight: '700' },
   formTitle: { fontSize: 12, color: '#999', fontWeight: '600', textTransform: 'uppercase', letterSpacing: 0.8 },
   formSubtitle: { fontSize: 20, fontWeight: '900', color: '#0A2E2A', marginBottom: 20, marginTop: 2 },
   fieldWrap: { marginBottom: 14 },
   fieldLabel: { fontSize: 12, fontWeight: '700', color: '#444', marginBottom: 6 },
   input: { backgroundColor: '#F7F9FC', borderWidth: 1, borderColor: '#E5EAF0', borderRadius: 12, paddingHorizontal: 14, paddingVertical: 12, fontSize: 14, color: '#222' },
   textArea: { height: 110, paddingTop: 12 },
-  submitBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', backgroundColor: '#0DB591', borderRadius: 14, paddingVertical: 15, marginTop: 6, elevation: 3, shadowColor: '#0DB591', shadowOpacity: 0.3, shadowOffset: { width: 0, height: 4 }, shadowRadius: 10 },
+  submitBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', backgroundColor: '#0C6875', borderRadius: 14, paddingVertical: 15, marginTop: 6, elevation: 3, shadowColor: '#0C6875', shadowOpacity: 0.3, shadowOffset: { width: 0, height: 4 }, shadowRadius: 10 },
   submitText: { color: '#fff', fontSize: 15, fontWeight: '800' },
 });

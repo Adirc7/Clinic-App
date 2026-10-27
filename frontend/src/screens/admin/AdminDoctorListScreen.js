@@ -63,21 +63,21 @@ export default function AdminDoctorListScreen({ navigation }) {
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-          <Ionicons name="chevron-back" size={20} color="#1A4B44" />
+          <Ionicons name="chevron-back" size={20} color="#0F2A2E" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Manage Doctors</Text>
         <TouchableOpacity style={styles.addButton} onPress={() => navigation.navigate('EditDoctor', { doctor: null })}>
-          <Ionicons name="add" size={24} color="#0DB591" />
+          <Ionicons name="add" size={24} color="#0C6875" />
         </TouchableOpacity>
       </View>
 
       {loading ? (
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#0DB591" />
+          <ActivityIndicator size="large" color="#0C6875" />
         </View>
       ) : doctors.length === 0 ? (
         <View style={styles.emptyContainer}>
-          <Ionicons name="person-outline" size={48} color="#A3B5B3" />
+          <Ionicons name="person-outline" size={48} color="#8AA0A3" />
           <Text style={styles.emptyText}>No doctors found</Text>
           <TouchableOpacity
             style={styles.addFirstButton}
@@ -112,7 +112,7 @@ export default function AdminDoctorListScreen({ navigation }) {
                     />
                   ) : (
                     <View style={styles.profileImagePlaceholder}>
-                      <Ionicons name="person" size={24} color="#0DB591" />
+                      <Ionicons name="person" size={24} color="#0C6875" />
                     </View>
                   )}
                 </View>
@@ -170,7 +170,7 @@ export default function AdminDoctorListScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F2FAF8',
+    backgroundColor: '#F3F7F8',
   },
   header: {
     flexDirection: 'row',
@@ -193,13 +193,13 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#1A4B44',
+    color: '#0F2A2E',
   },
   addButton: {
     width: 36,
     height: 36,
     borderRadius: 10,
-    backgroundColor: '#E8F8F5',
+    backgroundColor: '#E7F1F2',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -215,14 +215,14 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     marginTop: 12,
-    color: '#A3B5B3',
+    color: '#8AA0A3',
     fontSize: 16,
   },
   addFirstButton: {
     marginTop: 16,
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#0DB591',
+    backgroundColor: '#0C6875',
     paddingHorizontal: 20,
     paddingVertical: 12,
     borderRadius: 10,
@@ -265,7 +265,7 @@ const styles = StyleSheet.create({
     width: 50,
     height: 50,
     borderRadius: 25,
-    backgroundColor: '#E8F8F5',
+    backgroundColor: '#E7F1F2',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -275,7 +275,7 @@ const styles = StyleSheet.create({
   doctorName: {
     fontSize: 15,
     fontWeight: '700',
-    color: '#1A4B44',
+    color: '#0F2A2E',
     marginBottom: 2,
   },
   doctorSpec: {
@@ -285,11 +285,11 @@ const styles = StyleSheet.create({
   },
   doctorEmail: {
     fontSize: 11,
-    color: '#A3B5B3',
+    color: '#8AA0A3',
   },
   doctorPhone: {
     fontSize: 11,
-    color: '#A3B5B3',
+    color: '#8AA0A3',
   },
   statusRow: {
     flexDirection: 'row',
@@ -302,7 +302,7 @@ const styles = StyleSheet.create({
     borderRadius: 6,
   },
   statusBadgeActive: {
-    backgroundColor: '#E8F8F5',
+    backgroundColor: '#E7F1F2',
   },
   statusBadgeInactive: {
     backgroundColor: '#FDE8E8',
@@ -322,7 +322,7 @@ const styles = StyleSheet.create({
   },
   doctorAvailability: {
     fontSize: 11,
-    color: '#0DB591',
+    color: '#0C6875',
     fontWeight: '600',
     marginVertical: 4,
   },

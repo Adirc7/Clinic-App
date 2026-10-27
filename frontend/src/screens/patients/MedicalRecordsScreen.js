@@ -86,7 +86,7 @@ export default function MedicalRecordsScreen({ navigation }) {
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Medical Records</Text>
         <TouchableOpacity onPress={handleAddRecord} style={styles.addIconBtn}>
-          <Ionicons name="add" size={26} color="#0DB591" />
+          <Ionicons name="add" size={26} color="#0C6875" />
         </TouchableOpacity>
       </View>
 
@@ -107,7 +107,7 @@ export default function MedicalRecordsScreen({ navigation }) {
 
       {loading ? (
         <View style={styles.center}>
-          <ActivityIndicator size="large" color="#0DB591" />
+          <ActivityIndicator size="large" color="#0C6875" />
         </View>
       ) : (
         <ScrollView
@@ -164,7 +164,7 @@ export default function MedicalRecordsScreen({ navigation }) {
                   onPress={() => handleViewDocument(record.fileUrl)}
                 >
                   <Text style={styles.viewBtnText}>View / Download Document</Text>
-                  <Ionicons name="arrow-forward" size={16} color="#0DB591" />
+                  <Ionicons name="arrow-forward" size={16} color="#0C6875" />
                 </TouchableOpacity>
               </View>
             ))
@@ -189,7 +189,7 @@ const styles = StyleSheet.create({
   emptyState: { alignItems: 'center', justifyContent: 'center', marginTop: 60, padding: 20 },
   emptyTitle: { fontSize: 18, fontWeight: '700', color: '#333', marginTop: 16 },
   emptySubtitle: { fontSize: 14, color: '#666', textAlign: 'center', marginTop: 8, marginBottom: 24, lineHeight: 20 },
-  primaryBtn: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#0DB591', paddingHorizontal: 20, paddingVertical: 12, borderRadius: 12, gap: 8 },
+  primaryBtn: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#0C6875', paddingHorizontal: 20, paddingVertical: 12, borderRadius: 12, gap: 8 },
   primaryBtnText: { color: '#FFF', fontSize: 15, fontWeight: '700' },
   card: { backgroundColor: '#FFF', padding: 16, borderRadius: 16, marginBottom: 12, shadowColor: '#000', shadowOpacity: 0.05, shadowOffset: { width: 0, height: 2 }, shadowRadius: 6, elevation: 2 },
   cardHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 },
@@ -199,6 +199,6 @@ const styles = StyleSheet.create({
   cardFooter: { flexDirection: 'row', flexWrap: 'wrap', gap: 16, marginBottom: 16, paddingBottom: 16, borderBottomWidth: 1, borderBottomColor: '#F0F0F0' },
   metaInfo: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   metaText: { fontSize: 13, color: '#666' },
-  viewBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, backgroundColor: '#E8F8F5', paddingVertical: 12, borderRadius: 8 },
-  viewBtnText: { fontSize: 14, fontWeight: '700', color: '#0DB591' }
+  viewBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, backgroundColor: '#E7F1F2', paddingVertical: 12, borderRadius: 8 },
+  viewBtnText: { fontSize: 14, fontWeight: '700', color: '#0C6875' }
 });

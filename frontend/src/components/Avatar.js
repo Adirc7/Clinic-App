@@ -4,7 +4,7 @@ import { buildServerUrl } from '../api/axiosInstance';
 import { colors } from '../theme';
 
 const PALETTE = [
-  ['#E8F5F1', '#0A6B5B'],
+  ['#E7F1F2', '#0C6875'],
   ['#EAF1FF', '#2952A3'],
   ['#FFF4E5', '#9A5B00'],
   ['#F4F0FF', '#5B3BA8'],

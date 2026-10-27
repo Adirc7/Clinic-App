@@ -165,7 +165,7 @@ export default function AddMedicalRecordScreen({ navigation, route }) {
           >
             {file ? (
               <View style={styles.fileSelected}>
-                <Ionicons name="document-text" size={40} color="#0DB591" />
+                <Ionicons name="document-text" size={40} color="#0C6875" />
                 <Text style={styles.fileName} numberOfLines={1}>{file.name}</Text>
                 <Text style={styles.changeFileText}>Tap to change file</Text>
               </View>
@@ -213,11 +213,11 @@ const styles = StyleSheet.create({
   uploadBox: { borderWidth: 2, borderColor: '#E0E8F0', borderStyle: 'dashed', borderRadius: 16, backgroundColor: '#FAFCFF', padding: 24, alignItems: 'center', justifyContent: 'center', minHeight: 160 },
   fileSelected: { alignItems: 'center', gap: 8 },
   fileName: { fontSize: 14, fontWeight: '600', color: '#333', textAlign: 'center', marginTop: 8 },
-  changeFileText: { fontSize: 12, color: '#0DB591', marginTop: 4 },
+  changeFileText: { fontSize: 12, color: '#0C6875', marginTop: 4 },
   fileEmpty: { alignItems: 'center', gap: 8 },
   uploadPrompt: { fontSize: 16, fontWeight: '600', color: '#666', marginTop: 8 },
   uploadSubtext: { fontSize: 12, color: '#999' },
-  submitBtn: { backgroundColor: '#0DB591', paddingVertical: 16, borderRadius: 12, alignItems: 'center', marginTop: 10 },
+  submitBtn: { backgroundColor: '#0C6875', paddingVertical: 16, borderRadius: 12, alignItems: 'center', marginTop: 10 },
   submitBtnDisabled: { opacity: 0.7 },
   submitBtnText: { color: '#FFF', fontSize: 16, fontWeight: '700' }
 });

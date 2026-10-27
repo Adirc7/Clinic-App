@@ -85,7 +85,7 @@ export default function AdminRescheduleRequestsScreen({ navigation }) {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#0DB591" />
+          <ActivityIndicator size="large" color="#0C6875" />
         </View>
       </SafeAreaView>
     );
@@ -95,7 +95,7 @@ export default function AdminRescheduleRequestsScreen({ navigation }) {
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>
-          <Ionicons name="chevron-back" size={24} color="#1A4B44" />
+          <Ionicons name="chevron-back" size={24} color="#0F2A2E" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Reschedule Requests</Text>
         <View style={styles.placeholder} />
@@ -290,8 +290,8 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     padding: 12,
     borderLeftWidth: 3,
-    borderLeftColor: '#0DB591',
-    backgroundColor: '#F2FAF8',
+    borderLeftColor: '#0C6875',
+    backgroundColor: '#F3F7F8',
   },
   boxTitle: {
     fontSize: 12,
@@ -323,7 +323,7 @@ const styles = StyleSheet.create({
     borderColor: '#FF3B30',
   },
   approveBtn: {
-    backgroundColor: '#0DB591',
+    backgroundColor: '#0C6875',
   },
   btnText: {
     fontSize: 14,

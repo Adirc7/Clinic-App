@@ -76,7 +76,7 @@ export default function AdminMedicalRecordListScreen({ navigation }) {
           style={styles.fileBtn}
           onPress={() => handleViewFile(item.fileUrl)}
         >
-          <Ionicons name="document-attach-outline" size={24} color="#0DB591" />
+          <Ionicons name="document-attach-outline" size={24} color="#0C6875" />
         </TouchableOpacity>
       </View>
 
@@ -106,7 +106,7 @@ export default function AdminMedicalRecordListScreen({ navigation }) {
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
-          <Ionicons name="arrow-back" size={24} color="#1A4B44" />
+          <Ionicons name="arrow-back" size={24} color="#0F2A2E" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Medical Records</Text>
         <View style={{ width: 24 }} />
@@ -114,7 +114,7 @@ export default function AdminMedicalRecordListScreen({ navigation }) {
 
       {loading ? (
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#0DB591" />
+          <ActivityIndicator size="large" color="#0C6875" />
         </View>
       ) : (
         <FlatList
@@ -126,7 +126,7 @@ export default function AdminMedicalRecordListScreen({ navigation }) {
             <RefreshControl 
               refreshing={refreshing} 
               onRefresh={() => { setRefreshing(true); fetchRecords(); }} 
-              colors={['#0DB591']}
+              colors={['#0C6875']}
             />
           }
           ListEmptyComponent={
@@ -142,7 +142,7 @@ export default function AdminMedicalRecordListScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#F2FAF8' },
+  container: { flex: 1, backgroundColor: '#F3F7F8' },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -152,7 +152,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#E8F3F0',
   },
-  headerTitle: { fontSize: 18, fontWeight: 'bold', color: '#1A4B44' },
+  headerTitle: { fontSize: 18, fontWeight: 'bold', color: '#0F2A2E' },
   backBtn: { padding: 5 },
   loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   list: { padding: 15, paddingBottom: 30 },
@@ -161,7 +161,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     padding: 16,
     marginBottom: 16,
-    shadowColor: '#0A6B5B',
+    shadowColor: '#0C6875',
     shadowOpacity: 0.05,
     shadowRadius: 10,
     shadowOffset: { width: 0, height: 4 },
@@ -170,13 +170,13 @@ const styles = StyleSheet.create({
   cardHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 },
   recordMain: { flex: 1 },
   patientName: { fontSize: 13, color: '#64817D', fontWeight: '600', marginBottom: 2 },
-  recordTitle: { fontSize: 16, fontWeight: 'bold', color: '#1A4B44' },
+  recordTitle: { fontSize: 16, fontWeight: 'bold', color: '#0F2A2E' },
   dateText: { fontSize: 12, color: '#94A3B8', marginTop: 4 },
   fileBtn: {
     width: 44,
     height: 44,
     borderRadius: 12,
-    backgroundColor: '#E8F8F5',
+    backgroundColor: '#E7F1F2',
     justifyContent: 'center',
     alignItems: 'center',
   },

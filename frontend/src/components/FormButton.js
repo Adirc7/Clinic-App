@@ -34,7 +34,7 @@ export default function FormButton({
       activeOpacity={0.8}
     >
       {loading ? (
-        <ActivityIndicator color={variant === 'outline' ? '#0DB591' : '#FFF'} />
+        <ActivityIndicator color={variant === 'outline' ? '#0C6875' : '#FFF'} />
       ) : (
         <Text style={[styles.btnText, variant === 'outline' && styles.btnTextOutline]}>
           {title}
@@ -53,8 +53,8 @@ const styles = StyleSheet.create({
     marginTop: 6,
   },
   btnPrimary: {
-    backgroundColor: '#0DB591',
-    shadowColor: '#0DB591',
+    backgroundColor: '#0C6875',
+    shadowColor: '#0C6875',
     shadowOpacity: 0.35,
     shadowOffset: { width: 0, height: 4 },
     shadowRadius: 10,
@@ -63,7 +63,7 @@ const styles = StyleSheet.create({
   btnOutline: {
     backgroundColor: 'transparent',
     borderWidth: 1.5,
-    borderColor: '#0DB591',
+    borderColor: '#0C6875',
   },
   btnDisabled: {
     opacity: 0.5,
@@ -74,6 +74,6 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   btnTextOutline: {
-    color: '#0DB591',
+    color: '#0C6875',
   },
 });

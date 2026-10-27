@@ -139,7 +139,7 @@ export default function AdminCreateBillingScreen({ navigation, route }) {
     <SafeAreaView style={s.safe}>
       <View style={s.header}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={s.backBtn}>
-          <Ionicons name="arrow-back" size={20} color="#0A6B5B" />
+          <Ionicons name="arrow-back" size={20} color="#0C6875" />
         </TouchableOpacity>
         <Text style={s.headerTitle}>Create Invoice</Text>
         <View style={{ width: 36 }} />
@@ -150,7 +150,7 @@ export default function AdminCreateBillingScreen({ navigation, route }) {
         {/* Appointment Selector */}
         <Text style={s.sectionLabel}>Select Appointment</Text>
         <TouchableOpacity style={s.selector} onPress={() => setShowPicker(p => !p)}>
-          <Ionicons name="calendar-outline" size={18} color="#0DB591" />
+          <Ionicons name="calendar-outline" size={18} color="#0C6875" />
           <Text style={[s.selectorText, !selectedApt && { color: '#bbb' }]}>
             {selectedApt
               ? `${selectedApt.patientName || selectedApt.patientId?.name || 'Patient'} · ${new Date(selectedApt.date).toLocaleDateString()} · ${selectedApt.time}`
@@ -162,7 +162,7 @@ export default function AdminCreateBillingScreen({ navigation, route }) {
         {showPicker && (
           <View style={s.pickerList}>
             {loadingApts ? (
-              <ActivityIndicator color="#0DB591" style={{ padding: 20 }} />
+              <ActivityIndicator color="#0C6875" style={{ padding: 20 }} />
             ) : appointments.length === 0 ? (
               <Text style={s.pickerEmpty}>No unbilled completed appointments found.</Text>
             ) : (
@@ -186,12 +186,12 @@ export default function AdminCreateBillingScreen({ navigation, route }) {
         {selectedApt && (
           <View style={s.infoCard}>
             <View style={s.infoRow}>
-              <Ionicons name="finger-print-outline" size={15} color="#0DB591" />
+              <Ionicons name="finger-print-outline" size={15} color="#0C6875" />
               <Text style={s.infoLabel}>Appt ID:</Text>
               <Text style={s.infoValue} numberOfLines={1}>{selectedApt._id}</Text>
             </View>
             <View style={s.infoRow}>
-              <Ionicons name="person-outline" size={15} color="#0DB591" />
+              <Ionicons name="person-outline" size={15} color="#0C6875" />
               <Text style={s.infoLabel}>Patient:</Text>
               <View style={{ flex: 1 }}>
                 <Text style={s.infoValue}>{selectedApt.patientName || selectedApt.patientId?.name}</Text>
@@ -199,7 +199,7 @@ export default function AdminCreateBillingScreen({ navigation, route }) {
               </View>
             </View>
             <View style={s.infoRow}>
-              <Ionicons name="medical-outline" size={15} color="#0DB591" />
+              <Ionicons name="medical-outline" size={15} color="#0C6875" />
               <Text style={s.infoLabel}>Doctor:</Text>
               <Text style={s.infoValue}>Dr. {selectedApt.doctorId?.name || '—'}</Text>
             </View>
@@ -218,7 +218,7 @@ export default function AdminCreateBillingScreen({ navigation, route }) {
         <View style={s.sectionHeader}>
           <Text style={s.sectionLabel}>Itemized Charges</Text>
           <TouchableOpacity style={s.addBtn} onPress={addItem}>
-            <Ionicons name="add-circle" size={18} color="#0DB591" />
+            <Ionicons name="add-circle" size={18} color="#0C6875" />
             <Text style={s.addBtnText}>Add Item</Text>
           </TouchableOpacity>
         </View>
@@ -271,11 +271,11 @@ export default function AdminCreateBillingScreen({ navigation, route }) {
 const s = StyleSheet.create({
   safe: { flex: 1, backgroundColor: '#F5F7FA' },
   header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingVertical: 12, backgroundColor: '#fff', borderBottomWidth: 1, borderBottomColor: '#f0f0f0' },
-  backBtn: { width: 36, height: 36, borderRadius: 12, backgroundColor: '#F0FAF7', alignItems: 'center', justifyContent: 'center' },
+  backBtn: { width: 36, height: 36, borderRadius: 12, backgroundColor: '#E7F1F2', alignItems: 'center', justifyContent: 'center' },
   headerTitle: { fontSize: 17, fontWeight: '800', color: '#0A2E2A' },
   scroll: { padding: 16 },
 
-  sectionLabel: { fontSize: 11, fontWeight: '700', color: '#0DB591', textTransform: 'uppercase', letterSpacing: 1, marginTop: 20, marginBottom: 8 },
+  sectionLabel: { fontSize: 11, fontWeight: '700', color: '#0C6875', textTransform: 'uppercase', letterSpacing: 1, marginTop: 20, marginBottom: 8 },
 
   selector: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#fff', borderRadius: 14, padding: 14, borderWidth: 1, borderColor: '#E5EAF0', gap: 10 },
   selectorText: { flex: 1, fontSize: 14, color: '#333' },
@@ -283,7 +283,7 @@ const s = StyleSheet.create({
   pickerList: { backgroundColor: '#fff', borderRadius: 14, borderWidth: 1, borderColor: '#E5EAF0', marginTop: 4, overflow: 'hidden' },
   pickerEmpty: { textAlign: 'center', padding: 20, color: '#999', fontSize: 13 },
   pickerItem: { padding: 14, borderBottomWidth: 1, borderBottomColor: '#F0F4F8' },
-  pickerItemSelected: { backgroundColor: '#F0FAF7' },
+  pickerItemSelected: { backgroundColor: '#E7F1F2' },
   pickerItemName: { fontSize: 14, fontWeight: '700', color: '#0A2E2A' },
   pickerItemSub: { fontSize: 12, color: '#888', marginTop: 2 },
 
@@ -296,20 +296,20 @@ const s = StyleSheet.create({
   fieldWrap: { marginBottom: 12 },
   fieldLabel: { fontSize: 12, fontWeight: '700', color: '#444', marginBottom: 6 },
   inputRow: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#fff', borderRadius: 12, borderWidth: 1, borderColor: '#E5EAF0', overflow: 'hidden' },
-  inputPrefix: { backgroundColor: '#F0FAF7', paddingHorizontal: 14, paddingVertical: 13, borderRightWidth: 1, borderRightColor: '#E5EAF0' },
-  prefixText: { fontSize: 14, color: '#0DB591', fontWeight: '700' },
+  inputPrefix: { backgroundColor: '#E7F1F2', paddingHorizontal: 14, paddingVertical: 13, borderRightWidth: 1, borderRightColor: '#E5EAF0' },
+  prefixText: { fontSize: 14, color: '#0C6875', fontWeight: '700' },
   input: { flex: 1, fontSize: 15, color: '#222', paddingHorizontal: 14, paddingVertical: 12 },
 
   totalCard: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#0A2E2A', borderRadius: 16, padding: 18, marginTop: 8 },
   totalLabel: { fontSize: 14, color: 'rgba(255,255,255,0.7)', fontWeight: '600' },
-  totalValue: { fontSize: 22, color: '#0DB591', fontWeight: '900' },
+  totalValue: { fontSize: 22, color: '#0C6875', fontWeight: '900' },
 
-  submitBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', backgroundColor: '#0DB591', borderRadius: 14, paddingVertical: 16, marginTop: 20, gap: 8, elevation: 4, shadowColor: '#0DB591', shadowOpacity: 0.35, shadowOffset: { width: 0, height: 4 }, shadowRadius: 10 },
+  submitBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', backgroundColor: '#0C6875', borderRadius: 14, paddingVertical: 16, marginTop: 20, gap: 8, elevation: 4, shadowColor: '#0C6875', shadowOpacity: 0.35, shadowOffset: { width: 0, height: 4 }, shadowRadius: 10 },
   submitText: { color: '#fff', fontSize: 16, fontWeight: '800' },
 
   sectionHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 10, marginBottom: 4 },
   addBtn: { flexDirection: 'row', alignItems: 'center', gap: 4 },
-  addBtnText: { fontSize: 13, color: '#0DB591', fontWeight: '700' },
+  addBtnText: { fontSize: 13, color: '#0C6875', fontWeight: '700' },
   itemRow: { flexDirection: 'row', alignItems: 'center', gap: 10, backgroundColor: '#fff', borderRadius: 12, paddingHorizontal: 12, paddingVertical: 8, marginBottom: 8, borderWidth: 1, borderColor: '#E5EAF0' },
   itemDesc: { flex: 2, fontSize: 14, paddingVertical: 4 },
   itemAmount: { flex: 1, fontSize: 14, fontWeight: '700', color: '#0A2E2A', textAlign: 'right', paddingVertical: 4 },

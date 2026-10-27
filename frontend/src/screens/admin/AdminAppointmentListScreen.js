@@ -20,7 +20,7 @@ const getStatusColor = (status) => {
     case 'pending':
       return '#FF9500';
     case 'confirmed':
-      return '#0077B6';
+      return '#0C6875';
     case 'completed':
       return '#34C759';
     case 'cancelled':
@@ -80,7 +80,7 @@ export default function AdminAppointmentListScreen({ navigation }) {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#0DB591" />
+          <ActivityIndicator size="large" color="#0C6875" />
         </View>
       </SafeAreaView>
     );
@@ -93,7 +93,7 @@ export default function AdminAppointmentListScreen({ navigation }) {
           style={styles.backButton}
           onPress={() => navigation.goBack()}
         >
-          <Ionicons name="chevron-back" size={24} color="#1A4B44" />
+          <Ionicons name="chevron-back" size={24} color="#0F2A2E" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>All Appointments</Text>
         <View style={styles.placeholder} />
@@ -335,7 +335,7 @@ export default function AdminAppointmentListScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F2FAF8',
+    backgroundColor: '#F3F7F8',
   },
   loadingContainer: {
     flex: 1,
@@ -363,7 +363,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#1A4B44',
+    color: '#0F2A2E',
   },
   placeholder: {
     width: 36,
@@ -387,8 +387,8 @@ const styles = StyleSheet.create({
     borderColor: '#E8F3F0',
   },
   filterButtonActive: {
-    backgroundColor: '#0DB591',
-    borderColor: '#0DB591',
+    backgroundColor: '#0C6875',
+    borderColor: '#0C6875',
   },
   filterButtonText: {
     fontSize: 13,
@@ -412,12 +412,12 @@ const styles = StyleSheet.create({
     marginTop: 12,
     fontSize: 16,
     fontWeight: '700',
-    color: '#1A4B44',
+    color: '#0F2A2E',
   },
   emptyStateSubtext: {
     marginTop: 4,
     fontSize: 13,
-    color: '#A3B5B3',
+    color: '#8AA0A3',
   },
   appointmentsList: {
     paddingBottom: 40,
@@ -428,8 +428,8 @@ const styles = StyleSheet.create({
     padding: 16,
     marginBottom: 14,
     borderLeftWidth: 4,
-    borderLeftColor: '#0DB591',
-    shadowColor: '#0A6B5B',
+    borderLeftColor: '#0C6875',
+    shadowColor: '#0C6875',
     shadowOpacity: 0.05,
     shadowOffset: { width: 0, height: 4 },
     shadowRadius: 8,
@@ -447,12 +447,12 @@ const styles = StyleSheet.create({
   patientName: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#1A4B44',
+    color: '#0F2A2E',
     marginBottom: 4,
   },
   doctorName: {
     fontSize: 14,
-    color: '#0DB591',
+    color: '#0C6875',
     marginBottom: 8,
     fontWeight: '600',
   },
@@ -484,7 +484,7 @@ const styles = StyleSheet.create({
   descriptionLabel: {
     fontSize: 12,
     fontWeight: '700',
-    color: '#1A4B44',
+    color: '#0F2A2E',
     marginBottom: 4,
   },
   descriptionText: {
@@ -508,7 +508,7 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   confirmBtn: {
-    backgroundColor: '#0DB591',
+    backgroundColor: '#0C6875',
   },
   cancelBtn: {
     backgroundColor: '#E74C3C',
@@ -524,7 +524,7 @@ const styles = StyleSheet.create({
   },
   timestamp: {
     fontSize: 11,
-    color: '#A3B5B3',
+    color: '#8AA0A3',
   },
   modalOverlay: {
     flex: 1,
@@ -571,7 +571,7 @@ const styles = StyleSheet.create({
     height: '100%',
   },
   modalAvatarPlaceholder: {
-    backgroundColor: '#0077B6',
+    backgroundColor: '#0C6875',
     justifyContent: 'center',
     alignItems: 'center',
   },

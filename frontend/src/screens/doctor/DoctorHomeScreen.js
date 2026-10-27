@@ -13,7 +13,7 @@ export default function DoctorHomeScreen({ currentUser, onLogout }) {
     <SafeAreaView style={styles.container}>
       <View style={styles.card}>
         <View style={styles.badge}>
-          <Ionicons name="medkit" size={14} color="#0DB591" />
+          <Ionicons name="medkit" size={14} color="#0C6875" />
           <Text style={styles.badgeText}>Doctor Access</Text>
         </View>
 
@@ -38,7 +38,7 @@ export default function DoctorHomeScreen({ currentUser, onLogout }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F2FAF8',
+    backgroundColor: '#F3F7F8',
     justifyContent: 'center',
     paddingHorizontal: 20,
   },
@@ -46,7 +46,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     borderRadius: 22,
     padding: 20,
-    shadowColor: '#0A6B5B',
+    shadowColor: '#0C6875',
     shadowOpacity: 0.08,
     shadowRadius: 14,
     shadowOffset: { width: 0, height: 6 },
@@ -57,7 +57,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    backgroundColor: '#E8F8F5',
+    backgroundColor: '#E7F1F2',
     borderRadius: 999,
     paddingHorizontal: 12,
     paddingVertical: 6,
@@ -98,7 +98,7 @@ const styles = StyleSheet.create({
   logoutButton: {
     height: 50,
     borderRadius: 12,
-    backgroundColor: '#0DB591',
+    backgroundColor: '#0C6875',
     justifyContent: 'center',
     alignItems: 'center',
   },

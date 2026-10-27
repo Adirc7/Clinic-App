@@ -149,7 +149,7 @@ export default function AddDoctorScreen({ navigation }) {
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-          <Ionicons name="chevron-back" size={20} color="#1A4B44" />
+          <Ionicons name="chevron-back" size={20} color="#0F2A2E" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Add Doctor Profile</Text>
       </View>
@@ -162,11 +162,11 @@ export default function AddDoctorScreen({ navigation }) {
           {/* Full Name */}
           <View style={styles.inputGroup}>
             <View style={[styles.inputWrap, errors.name && styles.inputWrapError]}>
-              <Ionicons name="person-outline" size={18} color="#87A2A0" />
+              <Ionicons name="person-outline" size={18} color="#8AA0A3" />
               <TextInput 
                 style={styles.input} 
                 placeholder="Full Name"
-                placeholderTextColor="#A3B5B3"
+                placeholderTextColor="#8AA0A3"
                 value={formData.name} 
                 onChangeText={(text) => {
                   setFormData({...formData, name: text});
@@ -180,11 +180,11 @@ export default function AddDoctorScreen({ navigation }) {
           {/* Email */}
           <View style={styles.inputGroup}>
             <View style={[styles.inputWrap, errors.email && styles.inputWrapError]}>
-              <Ionicons name="mail-outline" size={18} color="#87A2A0" />
+              <Ionicons name="mail-outline" size={18} color="#8AA0A3" />
               <TextInput 
                 style={styles.input} 
                 placeholder="Email Address"
-                placeholderTextColor="#A3B5B3"
+                placeholderTextColor="#8AA0A3"
                 keyboardType="email-address"
                 autoCapitalize="none"
                 value={formData.email} 
@@ -200,11 +200,11 @@ export default function AddDoctorScreen({ navigation }) {
           {/* Phone Number */}
           <View style={styles.inputGroup}>
             <View style={[styles.inputWrap, errors.phone && styles.inputWrapError]}>
-              <Ionicons name="call-outline" size={18} color="#87A2A0" />
+              <Ionicons name="call-outline" size={18} color="#8AA0A3" />
               <TextInput 
                 style={styles.input} 
                 placeholder="Phone Number"
-                placeholderTextColor="#A3B5B3"
+                placeholderTextColor="#8AA0A3"
                 keyboardType="phone-pad"
                 value={formData.phone} 
                 onChangeText={(text) => {
@@ -219,11 +219,11 @@ export default function AddDoctorScreen({ navigation }) {
           {/* Specialization */}
           <View style={styles.inputGroup}>
             <View style={[styles.inputWrap, errors.specialization && styles.inputWrapError]}>
-              <Ionicons name="medkit-outline" size={18} color="#87A2A0" />
+              <Ionicons name="medkit-outline" size={18} color="#8AA0A3" />
               <TextInput 
                 style={styles.input} 
                 placeholder="Specialization (e.g., Cardiologist)"
-                placeholderTextColor="#A3B5B3"
+                placeholderTextColor="#8AA0A3"
                 value={formData.specialization} 
                 onChangeText={(text) => {
                   setFormData({...formData, specialization: text});
@@ -237,11 +237,11 @@ export default function AddDoctorScreen({ navigation }) {
           {/* Experience */}
           <View style={styles.inputGroup}>
             <View style={[styles.inputWrap, errors.experience && styles.inputWrapError]}>
-              <Ionicons name="briefcase-outline" size={18} color="#87A2A0" />
+              <Ionicons name="briefcase-outline" size={18} color="#8AA0A3" />
               <TextInput 
                 style={styles.input} 
                 placeholder="Experience (Years)"
-                placeholderTextColor="#A3B5B3"
+                placeholderTextColor="#8AA0A3"
                 keyboardType="numeric"
                 value={formData.experience} 
                 onChangeText={(text) => {
@@ -256,11 +256,11 @@ export default function AddDoctorScreen({ navigation }) {
           {/* Qualifications */}
           <View style={styles.inputGroup}>
             <View style={[styles.inputWrap, errors.qualifications && styles.inputWrapError]}>
-              <Ionicons name="school-outline" size={18} color="#87A2A0" />
+              <Ionicons name="school-outline" size={18} color="#8AA0A3" />
               <TextInput 
                 style={styles.input} 
                 placeholder="Qualifications (e.g., MBBS, MD)"
-                placeholderTextColor="#A3B5B3"
+                placeholderTextColor="#8AA0A3"
                 value={formData.qualifications} 
                 onChangeText={(text) => {
                   setFormData({...formData, qualifications: text});
@@ -274,11 +274,11 @@ export default function AddDoctorScreen({ navigation }) {
           {/* Availability */}
           <View style={styles.inputGroup}>
             <View style={[styles.inputWrap, errors.availability && styles.inputWrapError]}>
-              <Ionicons name="time-outline" size={18} color="#87A2A0" />
+              <Ionicons name="time-outline" size={18} color="#8AA0A3" />
               <TextInput 
                 style={styles.input} 
                 placeholder="Availability (e.g., Mon-Fri 9AM-5PM)"
-                placeholderTextColor="#A3B5B3"
+                placeholderTextColor="#8AA0A3"
                 value={formData.availability} 
                 onChangeText={(text) => {
                   setFormData({...formData, availability: text});
@@ -301,7 +301,7 @@ export default function AddDoctorScreen({ navigation }) {
               ) : (
                 <View style={styles.imagePlaceholder}>
                   <View style={styles.uploadIconWrap}>
-                    <Ionicons name="cloud-upload-outline" size={24} color="#0DB591" />
+                    <Ionicons name="cloud-upload-outline" size={24} color="#0C6875" />
                   </View>
                   <Text style={styles.imagePlaceholderText}>Tap to select an image</Text>
                 </View>
@@ -348,7 +348,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#1A4B44',
+    color: '#0F2A2E',
   },
   contentContainer: {
     paddingHorizontal: 20,
@@ -358,7 +358,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     borderRadius: 20,
     padding: 20,
-    shadowColor: '#0A6B5B',
+    shadowColor: '#0C6875',
     shadowOpacity: 0.08,
     shadowRadius: 16,
     shadowOffset: { width: 0, height: 8 },
@@ -367,7 +367,7 @@ const styles = StyleSheet.create({
   cardTitle: {
     fontSize: 20,
     fontWeight: '700',
-    color: '#1A4B44',
+    color: '#0F2A2E',
   },
   cardSubtitle: {
     color: '#5F7A77',
@@ -383,11 +383,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 10,
     borderWidth: 1,
-    borderColor: '#DCEBE8',
+    borderColor: '#E3ECEE',
     borderRadius: 14,
     paddingHorizontal: 14,
     height: 52,
-    backgroundColor: '#FBFEFD',
+    backgroundColor: '#F8FBFB',
   },
   inputWrapError: {
     borderColor: '#E74C3C',
@@ -395,7 +395,7 @@ const styles = StyleSheet.create({
   },
   input: {
     flex: 1,
-    color: '#123F39',
+    color: '#0F2A2E',
     fontSize: 14,
   },
   errorText: {
@@ -407,19 +407,19 @@ const styles = StyleSheet.create({
   imageLabel: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#1A4B44',
+    color: '#0F2A2E',
     marginBottom: 10,
     marginLeft: 4,
   },
   imagePicker: {
     borderWidth: 1,
-    borderColor: '#DCEBE8',
+    borderColor: '#E3ECEE',
     borderStyle: 'dashed',
     borderRadius: 14,
     height: 140,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#FBFEFD',
+    backgroundColor: '#F8FBFB',
     overflow: 'hidden',
   },
   imagePickerError: {
@@ -433,13 +433,13 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: '#E8F8F5',
+    backgroundColor: '#E7F1F2',
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 10,
   },
   imagePlaceholderText: {
-    color: '#87A2A0',
+    color: '#8AA0A3',
     fontSize: 14,
   },
   previewImage: {
@@ -447,7 +447,7 @@ const styles = StyleSheet.create({
     height: '100%',
   },
   submitButton: {
-    backgroundColor: '#0DB591',
+    backgroundColor: '#0C6875',
     borderRadius: 14,
     alignItems: 'center',
     justifyContent: 'center',

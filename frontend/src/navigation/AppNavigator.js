@@ -76,6 +76,25 @@ function DoctorsStack({ currentUser }) {
       <Stack.Screen name="DoctorDetail">
         {(props) => <DoctorDetailScreen {...props} currentUser={currentUser} />}
       </Stack.Screen>
+      <Stack.Screen name="EditProfile" component={EditProfileScreen} />
+    </Stack.Navigator>
+  );
+}
+
+// Bookings tab has its own stack so "Change date", "View bill", "Prescription" and
+// "Rate visit" open inside this tab (React Navigation 7 doesn't jump into another
+// tab's stack by screen name).
+function AppointmentsStack({ currentUser }) {
+  return (
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="PatientAppointmentsMain" component={PatientAppointmentsScreen} />
+      <Stack.Screen name="DoctorDetail">
+        {(props) => <DoctorDetailScreen {...props} currentUser={currentUser} />}
+      </Stack.Screen>
+      <Stack.Screen name="PrescriptionDetail" component={PrescriptionDetailScreen} />
+      <Stack.Screen name="BillingDetail" component={PatientBillingScreen} />
+      <Stack.Screen name="Rating" component={RatingScreen} />
+      <Stack.Screen name="EditProfile" component={EditProfileScreen} />
     </Stack.Navigator>
   );
 }
@@ -114,8 +133,8 @@ function PatientTabNavigator({ currentUser, onLogout }) {
           };
           return <Ionicons name={icons[route.name] || 'ellipse'} size={22} color={color} />;
         },
-        tabBarActiveTintColor: '#0DB591',
-        tabBarInactiveTintColor: '#94A3B8',
+        tabBarActiveTintColor: '#0C6875',
+        tabBarInactiveTintColor: '#9AAEB1',
         tabBarStyle: {
           paddingBottom: bottomPad,
           paddingTop: 8,
@@ -144,7 +163,9 @@ function PatientTabNavigator({ currentUser, onLogout }) {
       <Tab.Screen name="Doctors" options={{ tabBarLabel: 'Doctors' }}>
         {(props) => <DoctorsStack {...props} currentUser={currentUser} />}
       </Tab.Screen>
-      <Tab.Screen name="Appointments" component={PatientAppointmentsScreen} options={{ tabBarLabel: 'Bookings' }} />
+      <Tab.Screen name="Appointments" options={{ tabBarLabel: 'Bookings' }}>
+        {(props) => <AppointmentsStack {...props} currentUser={currentUser} />}
+      </Tab.Screen>
       <Tab.Screen name="Bills" component={PatientBillingScreen} />
       <Tab.Screen name="Profile">
         {(props) => <ProfileStack {...props} currentUser={currentUser} onLogout={onLogout} />}
@@ -217,7 +238,7 @@ export default function AppNavigator() {
   if (isCheckingAuth) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#0DB591" />
+        <ActivityIndicator size="large" color="#0C6875" />
       </View>
     );
   }
@@ -312,6 +333,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#FAFAFA',
+    backgroundColor: '#F3F7F8',
   },
 });

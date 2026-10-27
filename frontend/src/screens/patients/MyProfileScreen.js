@@ -1,18 +1,10 @@
-import React, { useEffect, useState, useCallback } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ActivityIndicator,
-  TouchableOpacity,
-  ScrollView,
-  RefreshControl,
-  Alert,
-  Image,
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import React, { useCallback, useEffect, useState } from 'react';
+import { ActivityIndicator, Alert, Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import axiosInstance, { buildServerUrl } from '../../api/axiosInstance';
+import axiosInstance from '../../api/axiosInstance';
+import Avatar from '../../components/Avatar';
+import { Card, GradientHeader, InfoRow } from '../../components/ui';
+import { colors, radius } from '../../theme';
 
 export default function MyProfileScreen({ navigation, currentUser, onLogout }) {
   const [profile, setProfile] = useState(null);
@@ -24,19 +16,9 @@ export default function MyProfileScreen({ navigation, currentUser, onLogout }) {
       const res = await axiosInstance.get('/patients/profile');
       setProfile(res.data);
     } catch (error) {
-      if (error.response && error.response.status === 404) {
-        // Profile doesn't exist yet in the backend, initialize empty
-        setProfile({
-          userId: currentUser,
-          dateOfBirth: null,
-          gender: '',
-          bloodGroup: '',
-          age: null,
-          address: '',
-          emergencyContact: {}
-        });
-      } else {
-        console.log('Failed to load profile', error);
+      if (error.response?.status === 404) {
+        // No medical profile yet
+        setProfile({ userId: currentUser, emergencyContact: {} });
       }
     } finally {
       setLoading(false);
@@ -45,283 +27,161 @@ export default function MyProfileScreen({ navigation, currentUser, onLogout }) {
   }, [currentUser]);
 
   useEffect(() => {
-    const unsubscribe = navigation.addListener('focus', () => {
-      fetchProfile();
-    });
-    return unsubscribe;
+    fetchProfile();
+    return navigation.addListener('focus', fetchProfile);
   }, [navigation, fetchProfile]);
 
   if (loading) {
     return (
       <View style={styles.center}>
-        <ActivityIndicator size="large" color="#0DB591" />
+        <ActivityIndicator size="large" color={colors.primary} />
       </View>
     );
   }
 
-  if (!profile) {
-    return (
-      <View style={styles.center}>
-        <Text>Error loading profile.</Text>
-      </View>
-    );
-  }
+  const p = profile || { userId: currentUser, emergencyContact: {} };
+  const user = p.userId || currentUser || {};
+  const { dateOfBirth, gender, bloodGroup, age, address, emergencyContact } = p;
+  const isIncomplete = !dateOfBirth || !gender || !address;
 
-  const { userId, dateOfBirth, gender, bloodGroup, age, address, emergencyContact } = profile;
+  const confirmLogout = () =>
+    Alert.alert('Log out', 'Are you sure you want to log out?', [
+      { text: 'Cancel', style: 'cancel' },
+      { text: 'Log out', style: 'destructive', onPress: () => onLogout && onLogout() },
+    ]);
 
-  // Check if major profile details are missing
-  const isProfileIncomplete = !dateOfBirth || !gender || !bloodGroup || !address;
+  const menu = [
+    { label: 'Medical records', sub: 'Lab reports, scans & documents', icon: 'folder-open', color: colors.violet, bg: colors.violetSoft, onPress: () => navigation.navigate('MedicalRecords') },
+    { label: 'Prescriptions', sub: 'Medicines from your doctors', icon: 'medkit', color: colors.warning, bg: colors.warningSoft, onPress: () => navigation.navigate('PatientPrescriptions') },
+    { label: 'Edit medical profile', sub: 'Personal & emergency details', icon: 'create', color: colors.primary, bg: colors.primarySoft, onPress: () => navigation.navigate('EditProfile') },
+  ];
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>My Profile</Text>
-        <View style={{ flexDirection: 'row', gap: 10 }}>
-          <TouchableOpacity 
-            style={styles.editBtn} 
-            onPress={() => navigation.navigate('EditProfile')}
-          >
-            <Ionicons name="pencil" size={18} color="#0DB591" />
-          </TouchableOpacity>
-        </View>
-      </View>
-
+    <View style={styles.screen}>
       <ScrollView
-        contentContainerStyle={styles.scroll}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={() => { setRefreshing(true); fetchProfile(); }} />
-        }
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingBottom: 120 }}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => { setRefreshing(true); fetchProfile(); }} tintColor="#fff" colors={[colors.primary]} />}
       >
-        <View style={styles.topSection}>
-          <View style={styles.avatar}>
-            {profile.profilePhoto ? (
-              <Image source={{ uri: buildServerUrl(profile.profilePhoto) }} style={{width: '100%', height: '100%', borderRadius: 40}} />
-            ) : (
-              <Text style={styles.avatarText}>{userId?.name?.charAt(0).toUpperCase()}</Text>
-            )}
+        <GradientHeader style={{ paddingBottom: 60 }}>
+          <View style={styles.headerRow}>
+            <Text style={styles.headerTitle}>My profile</Text>
+            <Pressable style={styles.editBtn} onPress={() => navigation.navigate('EditProfile')} hitSlop={8}>
+              <Ionicons name="create-outline" size={18} color="#fff" />
+            </Pressable>
           </View>
-          <Text style={styles.name}>{userId?.name}</Text>
-          <Text style={styles.email}>{userId?.email}</Text>
-        </View>
+          <View style={styles.identity}>
+            <Avatar name={user.name} photo={p.profilePhoto} size={88} radius={30} style={styles.avatar} />
+            <Text style={styles.name}>{user.name}</Text>
+            <Text style={styles.email}>{user.email}</Text>
+          </View>
+        </GradientHeader>
 
-        {isProfileIncomplete && (
-          <TouchableOpacity 
-            style={styles.incompleteBanner}
-            onPress={() => navigation.navigate('EditProfile')}
-          >
-            <View style={styles.incompleteIconWrap}>
-              <Ionicons name="alert-circle" size={22} color="#FF9800" />
+        <View style={styles.statsRow}>
+          {[
+            { label: 'Age', value: age != null ? `${age}` : '—', unit: age != null ? 'yrs' : '' },
+            { label: 'Blood', value: bloodGroup || '—', unit: '' },
+            { label: 'Gender', value: gender || '—', unit: '' },
+          ].map((st, i) => (
+            <View key={st.label} style={[styles.stat, i < 2 && styles.statBorder]}>
+              <Text style={styles.statValue}>
+                {st.value}
+                {st.unit ? <Text style={styles.statUnit}> {st.unit}</Text> : null}
+              </Text>
+              <Text style={styles.statLabel}>{st.label}</Text>
             </View>
-            <View style={styles.incompleteContent}>
-              <Text style={styles.incompleteTitle}>Profile Incomplete</Text>
-              <Text style={styles.incompleteDesc}>Tap here to complete your medical details for better care.</Text>
-            </View>
-            <Ionicons name="chevron-forward" size={18} color="#FF9800" />
-          </TouchableOpacity>
-        )}
-
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>Personal Details</Text>
-          <View style={styles.detailRow}>
-            <Text style={styles.detailLabel}>Age</Text>
-            <Text style={styles.detailValue}>{age || '-'} years</Text>
-          </View>
-          <View style={styles.detailRow}>
-            <Text style={styles.detailLabel}>Gender</Text>
-            <Text style={styles.detailValue}>{gender || '-'}</Text>
-          </View>
-          <View style={styles.detailRow}>
-            <Text style={styles.detailLabel}>Date of Birth</Text>
-            <Text style={styles.detailValue}>{dateOfBirth ? new Date(dateOfBirth).toLocaleDateString() : '-'}</Text>
-          </View>
-          <View style={styles.detailRow}>
-            <Text style={styles.detailLabel}>Blood Group</Text>
-            <Text style={styles.detailValue}>{bloodGroup || '-'}</Text>
-          </View>
-          <View style={styles.detailRow}>
-            <Text style={styles.detailLabel}>Address</Text>
-            <Text style={styles.detailValue}>{address || '-'}</Text>
-          </View>
+          ))}
         </View>
 
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>Emergency Contact</Text>
-          <View style={styles.detailRow}>
-            <Text style={styles.detailLabel}>Name</Text>
-            <Text style={styles.detailValue}>{emergencyContact?.name || '-'}</Text>
-          </View>
-          <View style={styles.detailRow}>
-            <Text style={styles.detailLabel}>Phone</Text>
-            <Text style={styles.detailValue}>{emergencyContact?.phone || '-'}</Text>
-          </View>
-          <View style={styles.detailRow}>
-            <Text style={styles.detailLabel}>Relationship</Text>
-            <Text style={styles.detailValue}>{emergencyContact?.relationship || '-'}</Text>
-          </View>
+        <View style={styles.body}>
+          {isIncomplete && (
+            <Pressable style={styles.banner} onPress={() => navigation.navigate('EditProfile')}>
+              <View style={styles.bannerIcon}>
+                <Ionicons name="alert-circle" size={22} color={colors.warning} />
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.bannerTitle}>Complete your medical profile</Text>
+                <Text style={styles.bannerSub}>Needed before you can book an appointment.</Text>
+              </View>
+              <Ionicons name="chevron-forward" size={18} color={colors.warning} />
+            </Pressable>
+          )}
+
+          <Text style={styles.sectionTitle}>Personal details</Text>
+          <Card style={styles.card}>
+            <InfoRow icon="calendar-outline" label="Date of birth" value={dateOfBirth ? new Date(dateOfBirth).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : null} />
+            <InfoRow icon="location-outline" label="Address" value={address} last />
+          </Card>
+
+          <Text style={styles.sectionTitle}>Emergency contact</Text>
+          <Card style={styles.card}>
+            <InfoRow icon="person-outline" label="Name" value={emergencyContact?.name} />
+            <InfoRow icon="call-outline" label="Phone" value={emergencyContact?.phone} />
+            <InfoRow icon="people-outline" label="Relationship" value={emergencyContact?.relationship} last />
+          </Card>
+
+          <Text style={styles.sectionTitle}>My health</Text>
+          <Card style={{ padding: 6 }}>
+            {menu.map((m, i) => (
+              <Pressable key={m.label} onPress={m.onPress} style={({ pressed }) => [styles.menuItem, i < menu.length - 1 && styles.menuBorder, pressed && { opacity: 0.7 }]}>
+                <View style={[styles.menuIcon, { backgroundColor: m.bg }]}>
+                  <Ionicons name={m.icon} size={19} color={m.color} />
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.menuLabel}>{m.label}</Text>
+                  <Text style={styles.menuSub}>{m.sub}</Text>
+                </View>
+                <Ionicons name="chevron-forward" size={18} color={colors.muted} />
+              </Pressable>
+            ))}
+          </Card>
+
+          <Pressable style={styles.logout} onPress={confirmLogout}>
+            <Ionicons name="log-out-outline" size={20} color={colors.danger} />
+            <Text style={styles.logoutText}>Log out</Text>
+          </Pressable>
         </View>
-
-        <TouchableOpacity 
-          style={styles.actionBtnCard}
-          onPress={() => navigation.navigate('MedicalRecords')}
-        >
-          <View style={styles.actionBtnIcon}>
-            <Ionicons name="folder-outline" size={24} color="#0DB591" />
-          </View>
-          <Text style={styles.actionBtnText}>My Medical Records</Text>
-          <Ionicons name="chevron-forward" size={20} color="#CCC" />
-        </TouchableOpacity>
-
-        <TouchableOpacity 
-          style={styles.actionBtnCard}
-          onPress={() => navigation.navigate('PatientPrescriptions')}
-        >
-          <View style={styles.actionBtnIcon}>
-            <Ionicons name="document-text-outline" size={24} color="#0DB591" />
-          </View>
-          <Text style={styles.actionBtnText}>My Prescriptions</Text>
-          <Ionicons name="chevron-forward" size={20} color="#CCC" />
-        </TouchableOpacity>
-
-        <TouchableOpacity 
-          style={styles.logoutBtn} 
-          onPress={() => {
-            if (onLogout) {
-              onLogout();
-            } else {
-              Alert.alert('Logged out', 'Please restart the app to clear session.');
-            }
-          }}
-        >
-          <Ionicons name="log-out-outline" size={20} color="#FF3B30" />
-          <Text style={styles.logoutBtnText}>Log Out</Text>
-        </TouchableOpacity>
-        
-        <View style={{height: 100}} />
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#F2FAF8' },
-  center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    padding: 20,
-    backgroundColor: '#FFF',
-    alignItems: 'center',
-    borderBottomWidth: 1,
-    borderBottomColor: '#E8F3F0',
+  screen: { flex: 1, backgroundColor: colors.background },
+  center: { flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.background },
+  headerRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  headerTitle: { color: '#fff', fontSize: 18, fontWeight: '800' },
+  editBtn: { width: 40, height: 40, borderRadius: 12, backgroundColor: 'rgba(255,255,255,0.16)', alignItems: 'center', justifyContent: 'center' },
+  identity: { alignItems: 'center', marginTop: 8 },
+  avatar: { borderWidth: 3, borderColor: 'rgba(255,255,255,0.5)' },
+  name: { color: '#fff', fontSize: 22, fontWeight: '800', marginTop: 12 },
+  email: { color: 'rgba(255,255,255,0.8)', fontSize: 13, marginTop: 2 },
+
+  statsRow: {
+    flexDirection: 'row', backgroundColor: colors.surface, marginHorizontal: 20, marginTop: -36,
+    borderRadius: radius.lg, paddingVertical: 14,
+    shadowColor: '#0C3A40', shadowOpacity: 0.08, shadowRadius: 16, shadowOffset: { width: 0, height: 6 }, elevation: 4,
   },
-  headerTitle: { fontSize: 20, fontWeight: 'bold', color: '#1A4B44' },
-  editBtn: {
-    padding: 8,
-    backgroundColor: '#E8F8F5',
-    borderRadius: 8,
-  },
-  scroll: { padding: 20 },
-  topSection: { alignItems: 'center', marginBottom: 20 },
-  avatar: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: '#0DB591',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 10,
-  },
-  avatarText: { fontSize: 32, color: '#FFF', fontWeight: 'bold' },
-  name: { fontSize: 22, fontWeight: 'bold', color: '#333' },
-  email: { fontSize: 14, color: '#666', marginTop: 4 },
-  incompleteBanner: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#FFF8E1',
-    borderWidth: 1,
-    borderColor: '#FFE082',
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 20,
-    elevation: 2,
-    shadowColor: '#FF9800',
-    shadowOpacity: 0.1,
-    shadowRadius: 6,
-    shadowOffset: { width: 0, height: 2 },
-  },
-  incompleteIconWrap: {
-    marginRight: 12,
-  },
-  incompleteContent: {
-    flex: 1,
-  },
-  incompleteTitle: {
-    fontSize: 15,
-    fontWeight: '700',
-    color: '#E65100',
-    marginBottom: 2,
-  },
-  incompleteDesc: {
-    fontSize: 12,
-    color: '#F57C00',
-    lineHeight: 16,
-  },
-  card: {
-    backgroundColor: '#FFF',
-    padding: 20,
-    borderRadius: 16,
-    marginBottom: 20,
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-    shadowOffset: { width: 0, height: 2 },
-  },
-  cardTitle: { fontSize: 16, fontWeight: '700', color: '#1A4B44', marginBottom: 15 },
-  detailRow: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: '#F0F0F0' },
-  detailLabel: { fontSize: 14, color: '#666' },
-  detailValue: { fontSize: 14, fontWeight: '600', color: '#333' },
-  logoutBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 15,
-    backgroundColor: '#FFF0F0',
-    borderRadius: 12,
-    marginTop: 10,
-    gap: 10,
-  },
-  logoutBtnText: {
-    color: '#FF3B30',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  actionBtnCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#FFF',
-    padding: 16,
-    borderRadius: 16,
-    marginBottom: 20,
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-    shadowOffset: { width: 0, height: 2 },
-  },
-  actionBtnIcon: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: '#E8F8F5',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 12,
-  },
-  actionBtnText: {
-    flex: 1,
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#1A4B44',
-  }
+  stat: { flex: 1, alignItems: 'center' },
+  statBorder: { borderRightWidth: 1, borderRightColor: colors.border },
+  statValue: { fontSize: 18, fontWeight: '800', color: colors.ink },
+  statUnit: { fontSize: 12, color: colors.muted, fontWeight: '600' },
+  statLabel: { fontSize: 12, color: colors.muted, marginTop: 2 },
+
+  body: { paddingHorizontal: 20, paddingTop: 8 },
+  banner: { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: colors.warningSoft, borderRadius: radius.lg, padding: 14, marginTop: 16, borderWidth: 1, borderColor: '#FCE3B4' },
+  bannerIcon: { width: 40, height: 40, borderRadius: 12, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center' },
+  bannerTitle: { fontSize: 14, fontWeight: '800', color: '#92400E' },
+  bannerSub: { fontSize: 12, color: '#B45309', marginTop: 2 },
+
+  sectionTitle: { fontSize: 16, fontWeight: '800', color: colors.ink, marginTop: 22, marginBottom: 10 },
+  card: { paddingVertical: 4 },
+  menuItem: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 12 },
+  menuBorder: { borderBottomWidth: 1, borderBottomColor: colors.border },
+  menuIcon: { width: 42, height: 42, borderRadius: 13, alignItems: 'center', justifyContent: 'center' },
+  menuLabel: { fontSize: 15, fontWeight: '700', color: colors.ink },
+  menuSub: { fontSize: 12, color: colors.body, marginTop: 1 },
+
+  logout: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, height: 52, borderRadius: radius.md, backgroundColor: colors.dangerSoft, marginTop: 22 },
+  logoutText: { color: colors.danger, fontWeight: '800', fontSize: 15 },
 });

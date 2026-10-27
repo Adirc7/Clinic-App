@@ -38,7 +38,7 @@ export default function PrescriptionDetailScreen({ route, navigation }) {
   if (loading) {
     return (
       <SafeAreaView style={styles.center}>
-        <ActivityIndicator size="large" color="#0DB591" />
+        <ActivityIndicator size="large" color="#0C6875" />
       </SafeAreaView>
     );
   }
@@ -48,7 +48,7 @@ export default function PrescriptionDetailScreen({ route, navigation }) {
       <SafeAreaView style={styles.container}>
         <View style={styles.header}>
           <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
-            <Ionicons name="arrow-back" size={24} color="#1A4B44" />
+            <Ionicons name="arrow-back" size={24} color="#0F2A2E" />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Prescription</Text>
           <View style={{ width: 24 }} />
@@ -65,7 +65,7 @@ export default function PrescriptionDetailScreen({ route, navigation }) {
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
-          <Ionicons name="arrow-back" size={24} color="#1A4B44" />
+          <Ionicons name="arrow-back" size={24} color="#0F2A2E" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Digital Prescription</Text>
         <View style={{ width: 24 }} />
@@ -123,7 +123,7 @@ export default function PrescriptionDetailScreen({ route, navigation }) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#F2FAF8' },
+  container: { flex: 1, backgroundColor: '#F3F7F8' },
   center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   header: {
     flexDirection: 'row',
@@ -134,7 +134,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#E8F3F0',
   },
-  headerTitle: { fontSize: 18, fontWeight: 'bold', color: '#1A4B44' },
+  headerTitle: { fontSize: 18, fontWeight: 'bold', color: '#0F2A2E' },
   backBtn: { padding: 5 },
   emptyText: { color: '#666', marginTop: 15, fontSize: 16 },
   scroll: { padding: 20 },
@@ -149,15 +149,15 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 4 },
   },
   paperHeader: { alignItems: 'center', marginBottom: 20 },
-  clinicName: { fontSize: 20, fontWeight: 'bold', color: '#0DB591', marginBottom: 5 },
+  clinicName: { fontSize: 20, fontWeight: 'bold', color: '#0C6875', marginBottom: 5 },
   docName: { fontSize: 16, fontWeight: 'bold', color: '#333' },
   docSpec: { fontSize: 14, color: '#666' },
   divider: { height: 1, backgroundColor: '#E0E0E0', width: '100%', marginVertical: 15 },
   patientInfo: { fontSize: 14, fontWeight: '600', color: '#333', alignSelf: 'flex-start' },
-  idInfo: { fontSize: 12, color: '#0DB591', alignSelf: 'flex-start', marginTop: 2, fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace' },
+  idInfo: { fontSize: 12, color: '#0C6875', alignSelf: 'flex-start', marginTop: 2, fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace' },
   dateText: { fontSize: 13, color: '#666', alignSelf: 'flex-start', marginTop: 5 },
   rxSymbol: { marginBottom: 20 },
-  rxText: { fontSize: 28, fontWeight: 'bold', color: '#1A4B44', fontStyle: 'italic' },
+  rxText: { fontSize: 28, fontWeight: 'bold', color: '#0F2A2E', fontStyle: 'italic' },
   medRow: { marginBottom: 15 },
   medName: { fontSize: 16, fontWeight: 'bold', color: '#333', marginBottom: 4 },
   medDetails: { fontSize: 14, color: '#666', marginLeft: 15 },

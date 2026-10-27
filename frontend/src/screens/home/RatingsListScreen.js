@@ -63,7 +63,7 @@ export default function RatingsListScreen({ navigation }) {
 
       {loading ? (
         <View style={styles.center}>
-          <ActivityIndicator size="large" color="#0DB591" />
+          <ActivityIndicator size="large" color="#0C6875" />
         </View>
       ) : (
         <ScrollView
@@ -73,7 +73,7 @@ export default function RatingsListScreen({ navigation }) {
             <RefreshControl refreshing={refreshing} onRefresh={() => {
               setRefreshing(true);
               fetchData();
-            }} colors={['#0DB591']} />
+            }} colors={['#0C6875']} />
           }
         >
           {completedAppointments.length === 0 ? (
@@ -100,7 +100,7 @@ export default function RatingsListScreen({ navigation }) {
                     <Image source={{ uri: buildServerUrl(apt.doctorId.profilePhoto) }} style={styles.avatar} />
                   ) : (
                     <View style={styles.avatarPlaceholder}>
-                      <Ionicons name="person" size={20} color="#0DB591" />
+                      <Ionicons name="person" size={20} color="#0C6875" />
                     </View>
                   )}
                   <View style={styles.doctorDetails}>
@@ -149,7 +149,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 22,
     fontWeight: '800',
-    color: '#1A4B44',
+    color: '#0F2A2E',
     marginBottom: 4,
   },
   headerSub: {
@@ -216,13 +216,13 @@ const styles = StyleSheet.create({
     color: '#64748B',
   },
   statusBadge: {
-    backgroundColor: '#E8F8F5',
+    backgroundColor: '#E7F1F2',
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 8,
   },
   statusText: {
-    color: '#0DB591',
+    color: '#0C6875',
     fontSize: 11,
     fontWeight: '700',
     textTransform: 'uppercase',
@@ -241,7 +241,7 @@ const styles = StyleSheet.create({
     width: 50,
     height: 50,
     borderRadius: 25,
-    backgroundColor: '#E8F8F5',
+    backgroundColor: '#E7F1F2',
     justifyContent: 'center',
     alignItems: 'center',
   },

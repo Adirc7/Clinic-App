@@ -146,7 +146,7 @@ export default function AdminBillingListScreen({ navigation }) {
 
       <View style={styles.actionRow}>
         {item.status === 'Pending' && (
-          <TouchableOpacity style={[styles.miniActionBtn, { backgroundColor: '#0DB591' }]} onPress={() => handleMarkPaid(item)}>
+          <TouchableOpacity style={[styles.miniActionBtn, { backgroundColor: '#0C6875' }]} onPress={() => handleMarkPaid(item)}>
             <Ionicons name="checkmark-done" size={16} color="#FFF" />
             <Text style={styles.miniActionText}>Mark Paid</Text>
           </TouchableOpacity>
@@ -163,7 +163,7 @@ export default function AdminBillingListScreen({ navigation }) {
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
-          <Ionicons name="arrow-back" size={24} color="#1A4B44" />
+          <Ionicons name="arrow-back" size={24} color="#0F2A2E" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Billing Management</Text>
         <View style={{ width: 24 }} />
@@ -182,7 +182,7 @@ export default function AdminBillingListScreen({ navigation }) {
       </View>
 
       {loading ? (
-        <ActivityIndicator size="large" color="#0DB591" style={{ marginTop: 50 }} />
+        <ActivityIndicator size="large" color="#0C6875" style={{ marginTop: 50 }} />
       ) : (
         <FlatList
           data={activeTab === 'Unbilled' ? unbilledAppointments : invoices.filter(inv => inv.status === activeTab)}
@@ -203,7 +203,7 @@ export default function AdminBillingListScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#F2FAF8' },
+  container: { flex: 1, backgroundColor: '#F3F7F8' },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -213,11 +213,11 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#E8F3F0',
   },
-  headerTitle: { fontSize: 18, fontWeight: 'bold', color: '#1A4B44' },
+  headerTitle: { fontSize: 18, fontWeight: 'bold', color: '#0F2A2E' },
   backBtn: { padding: 5 },
   filterRow: { flexDirection: 'row', padding: 15, gap: 10 },
   filterBtn: { flex: 1, paddingVertical: 10, alignItems: 'center', backgroundColor: '#E8F3F0', borderRadius: 8 },
-  filterBtnActive: { backgroundColor: '#0DB591' },
+  filterBtnActive: { backgroundColor: '#0C6875' },
   filterText: { color: '#666', fontWeight: '600' },
   filterTextActive: { color: '#FFF' },
   list: { paddingHorizontal: 15, paddingBottom: 20 },
@@ -233,7 +233,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
   },
   cardHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 15 },
-  patientName: { fontSize: 16, fontWeight: 'bold', color: '#1A4B44' },
+  patientName: { fontSize: 16, fontWeight: 'bold', color: '#0F2A2E' },
   dateText: { fontSize: 12, color: '#666', marginTop: 4 },
   statusBadge: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 12 },
   statusPending: { backgroundColor: '#FFF3E0' },
@@ -244,12 +244,12 @@ const styles = StyleSheet.create({
   detailsRow: { flexDirection: 'row', justifyContent: 'space-between', borderTopWidth: 1, borderTopColor: '#F0F0F0', paddingTop: 15 },
   detailLabel: { fontSize: 12, color: '#666', marginBottom: 4 },
   detailValue: { fontSize: 14, fontWeight: '600', color: '#333' },
-  amountValue: { fontSize: 16, fontWeight: 'bold', color: '#0DB591' },
+  amountValue: { fontSize: 16, fontWeight: 'bold', color: '#0C6875' },
   actionBtn: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#0DB591',
+    backgroundColor: '#0C6875',
     paddingVertical: 12,
     borderRadius: 10,
     marginTop: 15,

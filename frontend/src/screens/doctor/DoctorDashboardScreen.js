@@ -4,50 +4,20 @@ import {
   Text,
   StyleSheet,
   ScrollView,
-  TouchableOpacity,
+  Pressable,
   ActivityIndicator,
   Alert,
   Switch,
   Modal,
   RefreshControl,
-  Image,
 } from 'react-native';
 import { Calendar } from 'react-native-calendars';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
-import { doctorName } from '../../theme';
-import axiosInstance, { buildServerUrl, getErrorMessage } from '../../api/axiosInstance';
+import { Ionicons } from '@expo/vector-icons';
+import { colors, doctorName, greeting, radius, shadow } from '../../theme';
+import axiosInstance, { getErrorMessage } from '../../api/axiosInstance';
+import Avatar from '../../components/Avatar';
+import { Button, Card, EmptyState, GradientHeader, HeaderIconButton, SectionHeader, StatusBadge } from '../../components/ui';
 import { toDateKey } from '../../utils/date';
-
-const getGreeting = () => {
-  const hour = new Date().getHours();
-  if (hour < 5) return 'Good Night';
-  if (hour < 12) return 'Good Morning';
-  if (hour < 17) return 'Good Afternoon';
-  if (hour < 21) return 'Good Evening';
-  return 'Good Night';
-};
-
-const getGreetingIcon = () => {
-  const hour = new Date().getHours();
-  if (hour >= 5 && hour < 18) return 'sunny';
-  return 'moon';
-};
-
-const getStatusColor = (status) => {
-  switch (status?.toLowerCase()) {
-    case 'pending':
-      return '#FF9500';
-    case 'confirmed':
-      return '#0077B6';
-    case 'completed':
-      return '#34C759';
-    case 'cancelled':
-      return '#FF3B30';
-    default:
-      return '#8DA8A4';
-  }
-};
 
 export default function DoctorDashboardScreen({ currentUser, onLogout, navigation }) {
   const [loading, setLoading] = useState(true);
@@ -150,7 +120,7 @@ export default function DoctorDashboardScreen({ currentUser, onLogout, navigatio
           if (new Date(apt.date) >= todayStart && apt.status?.toLowerCase() !== 'cancelled') {
             newMarkedDates[dateStr] = {
               marked: true,
-              dotColor: '#34C759', // Green dot
+              dotColor: colors.accent,
             };
           }
         }
@@ -159,9 +129,9 @@ export default function DoctorDashboardScreen({ currentUser, onLogout, navigatio
       // Highlight today
       if (newMarkedDates[todayStr]) {
         newMarkedDates[todayStr].selected = true;
-        newMarkedDates[todayStr].selectedColor = '#0077B6';
+        newMarkedDates[todayStr].selectedColor = colors.primary;
       } else {
-        newMarkedDates[todayStr] = { selected: true, selectedColor: '#0077B6' };
+        newMarkedDates[todayStr] = { selected: true, selectedColor: colors.primary };
       }
 
       setMarkedDates(newMarkedDates);
@@ -244,961 +214,327 @@ export default function DoctorDashboardScreen({ currentUser, onLogout, navigatio
     ]);
   };
 
+  const firstPending = todayAppointments.filter((a) => a.status === 'Pending').length;
+
   if (loading) {
     return (
-      <SafeAreaView style={styles.container}>
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#0077B6" />
-          <Text style={styles.loadingText}>Loading dashboard...</Text>
-        </View>
-      </SafeAreaView>
+      <View style={[styles.container, { alignItems: 'center', justifyContent: 'center' }]}>
+        <ActivityIndicator size="large" color={colors.primary} />
+        <Text style={styles.loadingText}>Loading your day…</Text>
+      </View>
     );
   }
 
+  const confirmLogout = () =>
+    Alert.alert('Log out', 'Log out of your doctor account?', [
+      { text: 'Cancel', style: 'cancel' },
+      { text: 'Log out', style: 'destructive', onPress: onLogout },
+    ]);
+
+  const statCards = [
+    { label: 'Today', value: stats.todayCount, icon: 'today', color: colors.primary, bg: colors.primarySoft },
+    { label: 'Pending', value: stats.pendingCount, icon: 'hourglass', color: colors.warning, bg: colors.warningSoft },
+    { label: 'Completed', value: stats.completedCount, icon: 'checkmark-done', color: colors.success, bg: colors.successSoft },
+    { label: 'Patients', value: stats.totalPatients, icon: 'people', color: colors.violet, bg: colors.violetSoft },
+  ];
+
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <ScrollView
         showsVerticalScrollIndicator={false}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={() => {
-            setRefreshing(true);
-            fetchData();
-          }} />
-        }
+        contentContainerStyle={{ paddingBottom: 40 }}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => { setRefreshing(true); fetchData(); }} tintColor="#fff" colors={[colors.primary]} />}
       >
-        {/* Header Section */}
-        <View style={styles.headerWrapper}>
-          <Image 
-            source={{ uri: 'https://images.unsplash.com/photo-1624727828489-a1e03b79bba8?q=80&w=2071&auto=format&fit=crop' }}
-            style={styles.headerBgImage}
-            blurRadius={20}
+        <GradientHeader style={{ paddingBottom: 86 }}>
+          <View style={styles.headerRow}>
+            <View style={styles.avatarWrap}>
+              <Avatar name={currentUser?.name} photo={doctorProfile?.profilePhoto} size={56} radius={18} style={styles.avatar} />
+              <View style={[styles.onlineDot, { backgroundColor: doctorProfile?.isActive ? colors.success : colors.danger }]} />
+            </View>
+            <View style={{ flex: 1, marginLeft: 12 }}>
+              <Text style={styles.hello}>{greeting()},</Text>
+              <Text style={styles.name} numberOfLines={1}>{currentUser?.name ? doctorName(currentUser.name) : 'Doctor'}</Text>
+              <Text style={styles.spec}>{doctorProfile?.specialization || 'General'} · {currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</Text>
+            </View>
+            <HeaderIconButton icon="log-out-outline" onPress={confirmLogout} />
+          </View>
+
+          {doctorProfile && (
+            <View style={styles.availability}>
+              <View style={[styles.availDot, { backgroundColor: doctorProfile.isActive ? '#4ADE80' : '#FCA5A5' }]} />
+              <View style={{ flex: 1 }}>
+                <Text style={styles.availTitle}>{doctorProfile.isActive ? 'Accepting new bookings' : 'Not accepting bookings'}</Text>
+                <Text style={styles.availSub}>{doctorProfile.isActive ? 'Patients can see and book you' : 'You are hidden from the doctor list'}</Text>
+              </View>
+              <Switch
+                value={doctorProfile.isActive}
+                onValueChange={toggleAvailability}
+                trackColor={{ false: 'rgba(255,255,255,0.3)', true: '#4ADE80' }}
+                thumbColor="#FFF"
+                ios_backgroundColor="rgba(255,255,255,0.3)"
+              />
+            </View>
+          )}
+        </GradientHeader>
+
+        {/* Stats overlapping the header */}
+        <View style={styles.statsCard}>
+          {statCards.map((st, i) => (
+            <View key={st.label} style={[styles.stat, i < statCards.length - 1 && styles.statBorder]}>
+              <View style={[styles.statIcon, { backgroundColor: st.bg }]}>
+                <Ionicons name={st.icon} size={16} color={st.color} />
+              </View>
+              <Text style={styles.statValue}>{st.value}</Text>
+              <Text style={styles.statLabel}>{st.label}</Text>
+            </View>
+          ))}
+        </View>
+
+        <View style={styles.body}>
+          {/* Today's queue */}
+          <SectionHeader
+            title="Today's patients"
+            action={todayAppointments.length ? `${todayAppointments.length} total` : undefined}
+            style={{ marginTop: 24 }}
           />
-          <View style={styles.headerOverlay} />
-          
-          <View style={styles.headerSection}>
-            <View style={styles.headerContent}>
-              <View style={styles.doctorProfileSection}>
-                <View style={styles.profileImageWrapper}>
-                  {(doctorProfile?.profilePhoto || currentUser?.profilePhoto) ? (
-                    <Image
-                      source={{ uri: buildServerUrl(doctorProfile?.profilePhoto || currentUser?.profilePhoto) }}
-                      style={styles.profileImage}
-                    />
-                  ) : (
-                    <View style={styles.profileImagePlaceholder}>
-                      <Ionicons name="person" size={28} color="#FFFFFF" />
+          {firstPending > 0 && (
+            <View style={styles.pendingNote}>
+              <Ionicons name="alert-circle" size={16} color={colors.warning} />
+              <Text style={styles.pendingNoteText}>{firstPending} booking{firstPending > 1 ? 's' : ''} waiting for your confirmation</Text>
+            </View>
+          )}
+
+          {todayAppointments.length === 0 ? (
+            <Card>
+              <EmptyState icon="cafe-outline" title="No appointments today" message="Enjoy the quiet — upcoming visits show on the calendar below." />
+            </Card>
+          ) : (
+            todayAppointments.map((appointment) => {
+              const busy = updatingId === appointment._id;
+              const status = appointment.status || 'Pending';
+              return (
+                <Card key={appointment._id} style={styles.apptCard}>
+                  <Pressable
+                    style={styles.apptTop}
+                    onPress={() => { setSelectedAppointment(appointment); setIsPatientModalVisible(true); }}
+                  >
+                    <View style={styles.timeTile}>
+                      <Text style={styles.timeTileText}>{(appointment.time || '').split(' ')[0]}</Text>
+                      <Text style={styles.timeTileAmPm}>{(appointment.time || '').split(' ')[1] || ''}</Text>
+                    </View>
+                    <View style={{ flex: 1, marginLeft: 12 }}>
+                      <Text style={styles.patientName} numberOfLines={1}>{appointment.patientName || 'Patient'}</Text>
+                      <Text style={styles.apptReason} numberOfLines={1}>
+                        {(appointment.description || '').split('Reason: ')[1] || appointment.description || 'General consultation'}
+                      </Text>
+                    </View>
+                    <StatusBadge status={status} />
+                  </Pressable>
+
+                  {status === 'Pending' && (
+                    <View style={styles.actionRow}>
+                      <Button title="Confirm" icon="checkmark" small loading={busy} onPress={() => handleAccept(appointment._id)} style={{ flex: 1 }} />
+                      <Button title="Decline" icon="close" small variant="ghost" disabled={busy} onPress={() => handleReject(appointment._id)} style={{ flex: 1 }} />
                     </View>
                   )}
-                  <View style={[styles.onlineIndicator, { backgroundColor: doctorProfile?.isActive ? '#34C759' : '#FF3B30' }]} />
+                  {status === 'Confirmed' && (
+                    <View style={styles.actionRow}>
+                      <Button title="Mark as completed" icon="checkmark-done" small loading={busy} onPress={() => handleComplete(appointment._id)} style={{ flex: 1 }} />
+                    </View>
+                  )}
+                </Card>
+              );
+            })
+          )}
+
+          {/* Quick actions */}
+          <SectionHeader title="Quick actions" style={{ marginTop: 24 }} />
+          <View style={styles.quickRow}>
+            {[
+              { label: 'All appointments', icon: 'calendar', color: colors.info, bg: colors.infoSoft, onPress: () => navigation.navigate('AllAppointments') },
+              { label: 'Add prescription', icon: 'document-text', color: colors.primary, bg: colors.primarySoft, onPress: () => { Alert.alert('Add prescription', 'Open a completed appointment to attach a prescription.'); navigation.navigate('AllAppointments'); } },
+              { label: 'Reschedule', icon: 'swap-horizontal', color: colors.warning, bg: colors.warningSoft, onPress: () => navigation.navigate('AllAppointments') },
+            ].map((q) => (
+              <Pressable key={q.label} style={({ pressed }) => [styles.quickTile, pressed && { opacity: 0.85 }]} onPress={q.onPress}>
+                <View style={[styles.quickIcon, { backgroundColor: q.bg }]}>
+                  <Ionicons name={q.icon} size={20} color={q.color} />
                 </View>
-                
-                <View style={styles.nameContainer}>
-                  <View style={styles.greetingRow}>
-                    <Ionicons name={getGreetingIcon()} size={14} color="rgba(255, 255, 255, 0.9)" />
-                    <Text style={styles.greetingText}>{getGreeting()},</Text>
-                  </View>
-                  <Text style={styles.doctorName}>
-                    {currentUser?.name ? doctorName(currentUser.name) : 'Doctor'}
-                  </Text>
-                  <Text style={styles.doctorDetails}>
-                    ID: {currentUser?.id?.slice(-6).toUpperCase() || 'N/A'} • {doctorProfile?.specialization || 'General'}
-                  </Text>
-                  <Text style={styles.liveTime}>
-                    {currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                  </Text>
-                </View>
-              </View>
-
-              {/* Glass Logout Button */}
-              <TouchableOpacity
-                style={styles.glassLogoutBtn}
-                onPress={onLogout}
-                activeOpacity={0.7}
-              >
-                <View style={styles.glassContent}>
-                  <Ionicons name="log-out-outline" size={20} color="#FFFFFF" />
-                </View>
-              </TouchableOpacity>
-            </View>
-
-            {/* Availability Toggle */}
-            {doctorProfile && (
-              <View style={styles.availabilityToggleWrap}>
-                <Text style={styles.availabilityToggleLabel}>
-                  {doctorProfile.isActive ? 'Available' : 'Unavailable'}
-                </Text>
-                <Switch
-                  value={doctorProfile.isActive}
-                  onValueChange={toggleAvailability}
-                  trackColor={{ false: 'rgba(255,255,255,0.3)', true: '#34C759' }}
-                  thumbColor="#FFF"
-                  ios_backgroundColor="rgba(255,255,255,0.3)"
-                  style={{ transform: [{ scaleX: 0.75 }, { scaleY: 0.75 }] }}
-                />
-              </View>
-            )}
-          </View>
-        </View>
-
-        {/* Summary Cards */}
-        <View style={styles.cardsGrid}>
-          <View style={styles.card}>
-            <View style={[styles.cardIconBg, { backgroundColor: '#E3F2FD' }]}>
-              <MaterialCommunityIcons name="calendar-check" size={18} color="#0077B6" />
-            </View>
-            <View style={styles.cardTextWrap}>
-              <Text style={styles.cardValue}>{stats.todayCount}</Text>
-              <Text style={styles.cardLabel}>Today</Text>
-            </View>
+                <Text style={styles.quickLabel}>{q.label}</Text>
+              </Pressable>
+            ))}
           </View>
 
-          <View style={styles.card}>
-            <View style={[styles.cardIconBg, { backgroundColor: '#F3E5F5' }]}>
-              <MaterialCommunityIcons name="account-multiple" size={18} color="#7B1FA2" />
-            </View>
-            <View style={styles.cardTextWrap}>
-              <Text style={styles.cardValue}>{stats.totalPatients}</Text>
-              <Text style={styles.cardLabel}>Patients</Text>
-            </View>
-          </View>
-
-          <View style={styles.card}>
-            <View style={[styles.cardIconBg, { backgroundColor: '#FFF3E0' }]}>
-              <MaterialCommunityIcons name="clock-outline" size={18} color="#FF9500" />
-            </View>
-            <View style={styles.cardTextWrap}>
-              <Text style={styles.cardValue}>{stats.pendingCount}</Text>
-              <Text style={styles.cardLabel}>Pending</Text>
-            </View>
-          </View>
-
-          <View style={styles.card}>
-            <View style={[styles.cardIconBg, { backgroundColor: '#E8F5E9' }]}>
-              <MaterialCommunityIcons name="check-circle" size={18} color="#34C759" />
-            </View>
-            <View style={styles.cardTextWrap}>
-              <Text style={styles.cardValue}>{stats.completedCount}</Text>
-              <Text style={styles.cardLabel}>Done</Text>
-            </View>
-          </View>
-        </View>
-
-        {/* Calendar Section */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Upcoming Schedule</Text>
-          <View style={styles.calendarContainer}>
+          {/* Calendar */}
+          <SectionHeader title="Schedule" style={{ marginTop: 24 }} />
+          <Card style={{ padding: 8 }}>
             <Calendar
               markedDates={markedDates}
               theme={{
-                backgroundColor: '#ffffff',
                 calendarBackground: '#ffffff',
-                textSectionTitleColor: '#b6c1cd',
-                selectedDayBackgroundColor: '#0077B6',
+                textSectionTitleColor: colors.muted,
+                selectedDayBackgroundColor: colors.primary,
                 selectedDayTextColor: '#ffffff',
-                todayTextColor: '#0077B6',
-                dayTextColor: '#2d4150',
-                textDisabledColor: '#d9e1e8',
-                dotColor: '#34C759',
+                todayTextColor: colors.primary,
+                dayTextColor: colors.ink,
+                textDisabledColor: '#CBD5D7',
+                dotColor: colors.accent,
                 selectedDotColor: '#ffffff',
-                arrowColor: '#0077B6',
-                monthTextColor: '#0077B6',
-                indicatorColor: '#0077B6',
-                textDayFontWeight: '500',
-                textMonthFontWeight: 'bold',
-                textDayHeaderFontWeight: '600',
-                textDayFontSize: 12,
-                textMonthFontSize: 14,
-                textDayHeaderFontSize: 12
-
+                arrowColor: colors.primary,
+                monthTextColor: colors.ink,
+                textDayFontWeight: '600',
+                textMonthFontWeight: '800',
+                textDayHeaderFontWeight: '700',
+                textDayFontSize: 13,
+                textMonthFontSize: 16,
+                textDayHeaderFontSize: 12,
               }}
             />
-            <View style={styles.calendarLegend}>
-              <View style={styles.legendItem}>
-                <View style={[styles.legendDot, { backgroundColor: '#34C759' }]} />
-                <Text style={styles.legendText}>Appointments</Text>
-              </View>
-              <View style={styles.legendItem}>
-                <View style={[styles.legendDot, { backgroundColor: '#0077B6' }]} />
-                <Text style={styles.legendText}>Today</Text>
-              </View>
+            <View style={styles.legend}>
+              <View style={styles.legendItem}><View style={[styles.legendDot, { backgroundColor: colors.accent }]} /><Text style={styles.legendText}>Appointments</Text></View>
+              <View style={styles.legendItem}><View style={[styles.legendDot, { backgroundColor: '#FF3B30' }]} /><Text style={styles.legendText}>Holiday</Text></View>
+              <View style={styles.legendItem}><View style={[styles.legendDot, { backgroundColor: colors.primary }]} /><Text style={styles.legendText}>Today</Text></View>
             </View>
-          </View>
-        </View>
-
-        {/* Today's Appointments Section */}
-        <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Today&apos;s Appointments</Text>
-            <Text style={styles.appointmentCount}>{todayAppointments.length}</Text>
-          </View>
-
-          {todayAppointments.length === 0 ? (
-            <View style={styles.emptyState}>
-              <Ionicons name="calendar-outline" size={48} color="#D1D1D1" />
-              <Text style={styles.emptyStateText}>No appointments today</Text>
-              <Text style={styles.emptyStateSubtext}>You have a free day!</Text>
-            </View>
-          ) : (
-            <View>
-              {todayAppointments.map((appointment) => (
-                <View key={appointment._id} style={styles.appointmentCard}>
-                  <TouchableOpacity 
-                    onPress={() => {
-                      setSelectedAppointment(appointment);
-                      setIsPatientModalVisible(true);
-                    }}
-                    activeOpacity={0.7}
-                  >
-                  <View style={styles.appointmentHeader}>
-                    <View style={styles.appointmentInfo}>
-                      <Text style={styles.patientName}>
-                        {appointment.patientName || 'Patient'}
-                      </Text>
-                      <Text style={styles.appointmentTime}>
-                        <Ionicons name="time-outline" size={14} color="#666" />
-                        {' '}{appointment.time || 'N/A'}
-                      </Text>
-                    </View>
-                    <View
-                      style={[
-                        styles.statusBadge,
-                        { backgroundColor: getStatusColor(appointment.status) },
-                      ]}
-                    >
-                      <Text style={styles.statusBadgeText}>
-                        {appointment.status || 'Pending'}
-                      </Text>
-                    </View>
-                  </View>
-
-                  {appointment.description && (
-                    <Text style={styles.appointmentDesc}>{appointment.description}</Text>
-                  )}
-                  </TouchableOpacity>
-
-                  {appointment.status?.toLowerCase() === 'pending' && (
-                    <View style={styles.actionButtons}>
-                      <TouchableOpacity
-                        style={[
-                          styles.actionBtn,
-                          styles.acceptBtn,
-                          updatingId === appointment._id && styles.disabledBtn,
-                        ]}
-                        onPress={() => handleAccept(appointment._id)}
-                        disabled={updatingId === appointment._id}
-                      >
-                        {updatingId === appointment._id ? (
-                          <ActivityIndicator color="#FFF" size="small" />
-                        ) : (
-                          <>
-                            <Ionicons name="checkmark-circle" size={16} color="#FFF" />
-                            <Text style={styles.actionBtnText}>Confirm</Text>
-                          </>
-                        )}
-                      </TouchableOpacity>
-
-                      <TouchableOpacity
-                        style={[
-                          styles.actionBtn,
-                          styles.rejectBtn,
-                          updatingId === appointment._id && styles.disabledBtn,
-                        ]}
-                        onPress={() => handleReject(appointment._id)}
-                        disabled={updatingId === appointment._id}
-                      >
-                        {updatingId === appointment._id ? (
-                          <ActivityIndicator color="#FFF" size="small" />
-                        ) : (
-                          <>
-                            <Ionicons name="close-circle" size={16} color="#FFF" />
-                            <Text style={styles.actionBtnText}>Cancel</Text>
-                          </>
-                        )}
-                      </TouchableOpacity>
-                    </View>
-                  )}
-
-                  {appointment.status?.toLowerCase() === 'confirmed' && (
-                    <View style={styles.actionButtons}>
-                      <TouchableOpacity
-                        style={[
-                          styles.actionBtn,
-                          styles.completeBtn,
-                          updatingId === appointment._id && styles.disabledBtn,
-                        ]}
-                        onPress={() => handleComplete(appointment._id)}
-                        disabled={updatingId === appointment._id}
-                      >
-                        {updatingId === appointment._id ? (
-                          <ActivityIndicator color="#FFF" size="small" />
-                        ) : (
-                          <>
-                            <Ionicons name="checkmark-done-circle" size={16} color="#FFF" />
-                            <Text style={styles.actionBtnText}>Mark Complete</Text>
-                          </>
-                        )}
-                      </TouchableOpacity>
-                    </View>
-                  )}
-
-                </View>
-              ))}
-            </View>
-          )}
-        </View>
-
-        {/* Patient Details Modal */}
-        <Modal
-          visible={isPatientModalVisible}
-          animationType="slide"
-          transparent={true}
-          onRequestClose={() => setIsPatientModalVisible(false)}
-        >
-          <View style={styles.modalOverlay}>
-            <View style={styles.modalContent}>
-              <View style={styles.modalHeader}>
-                <Text style={styles.modalTitle}>Patient Information</Text>
-                <TouchableOpacity onPress={() => setIsPatientModalVisible(false)}>
-                  <Ionicons name="close" size={24} color="#333" />
-                </TouchableOpacity>
-              </View>
-
-              {selectedAppointment && (
-                <ScrollView contentContainerStyle={styles.modalBody}>
-                  <View style={styles.modalPatientHeader}>
-                    <View style={styles.modalAvatarWrap}>
-                      {selectedAppointment.patientProfile?.profilePhoto ? (
-                        <Image 
-                          source={{ uri: buildServerUrl(selectedAppointment.patientProfile.profilePhoto) }} 
-                          style={styles.modalAvatar} 
-                        />
-                      ) : (
-                        <View style={[styles.modalAvatar, styles.modalAvatarPlaceholder]}>
-                          <Text style={styles.modalAvatarText}>
-                            {selectedAppointment.patientName?.charAt(0).toUpperCase()}
-                          </Text>
-                        </View>
-                      )}
-                    </View>
-                    <View style={styles.modalPatientMeta}>
-                      <Text style={styles.modalPatientName}>{selectedAppointment.patientName}</Text>
-                      <Text style={styles.modalPatientEmail}>{selectedAppointment.patientId?.email}</Text>
-                    </View>
-                  </View>
-
-                  <View style={styles.modalInfoGrid}>
-                    <View style={styles.infoBox}>
-                      <Text style={styles.infoLabel}>Gender</Text>
-                      <Text style={styles.infoValue}>{selectedAppointment.patientProfile?.gender || 'N/A'}</Text>
-                    </View>
-                    <View style={styles.infoBox}>
-                      <Text style={styles.infoLabel}>Age</Text>
-                      <Text style={styles.infoValue}>{selectedAppointment.patientProfile?.age || 'N/A'}</Text>
-                    </View>
-                    <View style={styles.infoBox}>
-                      <Text style={styles.infoLabel}>Blood Group</Text>
-                      <Text style={styles.infoValue}>{selectedAppointment.patientProfile?.bloodGroup || 'N/A'}</Text>
-                    </View>
-                    <View style={styles.infoBox}>
-                      <Text style={styles.infoLabel}>Phone</Text>
-                      <Text style={styles.infoValue}>{selectedAppointment.patientPhone || 'N/A'}</Text>
-                    </View>
-                  </View>
-
-                  <View style={styles.modalSection}>
-                    <Text style={styles.modalSectionTitle}>Address</Text>
-                    <Text style={styles.modalSectionText}>{selectedAppointment.patientAddress || 'No address provided'}</Text>
-                  </View>
-
-                  <View style={styles.modalSection}>
-                    <Text style={styles.modalSectionTitle}>Emergency Contact</Text>
-                    {selectedAppointment.patientProfile?.emergencyContact ? (
-                      <View style={styles.emergencyBox}>
-                        <Text style={styles.emergencyText}>
-                          <Text style={{fontWeight: '700'}}>Name: </Text>
-                          {selectedAppointment.patientProfile.emergencyContact.name || 'N/A'}
-                        </Text>
-                        <Text style={styles.emergencyText}>
-                          <Text style={{fontWeight: '700'}}>Relation: </Text>
-                          {selectedAppointment.patientProfile.emergencyContact.relationship || 'N/A'}
-                        </Text>
-                        <Text style={styles.emergencyText}>
-                          <Text style={{fontWeight: '700'}}>Phone: </Text>
-                          {selectedAppointment.patientProfile.emergencyContact.phone || 'N/A'}
-                        </Text>
-                      </View>
-                    ) : (
-                      <Text style={styles.modalSectionText}>No emergency contact provided</Text>
-                    )}
-                  </View>
-
-                  <View style={[styles.modalSection, { borderBottomWidth: 0 }]}>
-                    <Text style={styles.modalSectionTitle}>Visit Reason</Text>
-                    <Text style={styles.modalSectionText}>{selectedAppointment.description || 'No description provided'}</Text>
-                  </View>
-
-                  {selectedAppointment.status?.toLowerCase() === 'completed' && (
-                    <TouchableOpacity
-                      style={[styles.actionBtn, styles.prescriptionBtn, { marginTop: 10, alignSelf: 'stretch', justifyContent: 'center' }]}
-                      onPress={() => {
-                        setIsPatientModalVisible(false);
-                        navigation.navigate('AddPrescription', { appointment: selectedAppointment });
-                      }}
-                    >
-                      <Ionicons name="document-text" size={18} color="#FFF" />
-                      <Text style={[styles.actionBtnText, { fontSize: 16, marginLeft: 8 }]}>Attach Prescription</Text>
-                    </TouchableOpacity>
-                  )}
-
-                  <TouchableOpacity
-                    style={[styles.actionBtn, { backgroundColor: '#0077B6', marginTop: 10, alignSelf: 'stretch', justifyContent: 'center' }]}
-                    onPress={() => {
-                      setIsPatientModalVisible(false);
-                      navigation.navigate('DoctorPatientRecords', { 
-                        patientId: (selectedAppointment.patientId._id || selectedAppointment.patientId).toString(), 
-                        patientName: selectedAppointment.patientName 
-                      });
-                    }}
-                  >
-                    <Ionicons name="folder-outline" size={18} color="#FFF" />
-                    <Text style={[styles.actionBtnText, { fontSize: 16, marginLeft: 8 }]}>View Medical Records</Text>
-                  </TouchableOpacity>
-                </ScrollView>
-              )}
-            </View>
-          </View>
-        </Modal>
-
-        {/* Quick Actions Section */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Quick Actions</Text>
-          <TouchableOpacity
-            style={styles.quickActionBtn}
-            onPress={() => navigation.navigate('AllAppointments')}
-          >
-            <View style={styles.quickActionIcon}>
-              <Ionicons name="calendar-outline" size={20} color="#0077B6" />
-            </View>
-            <Text style={styles.quickActionText}>View All Appointments</Text>
-            <Ionicons name="chevron-forward" size={20} color="#CCC" />
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.quickActionBtn}
-            onPress={() => {
-              Alert.alert('Info', 'Please select a completed appointment from the list to add a prescription.');
-              navigation.navigate('AllAppointments');
-            }}
-          >
-            <View style={styles.quickActionIcon}>
-              <Ionicons name="document-text-outline" size={20} color="#0077B6" />
-            </View>
-            <Text style={styles.quickActionText}>Add Prescription</Text>
-            <Ionicons name="chevron-forward" size={20} color="#CCC" />
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.quickActionBtn}
-            onPress={() => {
-              Alert.alert('Info', 'Please select an appointment from the list to view the patient\'s medical records.');
-              navigation.navigate('AllAppointments');
-            }}
-          >
-            <View style={styles.quickActionIcon}>
-              <Ionicons name="folder-outline" size={20} color="#0077B6" />
-            </View>
-            <Text style={styles.quickActionText}>View Medical Records</Text>
-            <Ionicons name="chevron-forward" size={20} color="#CCC" />
-          </TouchableOpacity>
+          </Card>
         </View>
       </ScrollView>
-    </SafeAreaView>
+
+      {/* Patient details sheet */}
+      <Modal visible={isPatientModalVisible} animationType="slide" transparent onRequestClose={() => setIsPatientModalVisible(false)}>
+        <Pressable style={styles.overlay} onPress={() => setIsPatientModalVisible(false)}>
+          <Pressable style={styles.sheet} onPress={() => {}}>
+            <View style={styles.handle} />
+            {selectedAppointment && (
+              <ScrollView showsVerticalScrollIndicator={false}>
+                <View style={styles.sheetHead}>
+                  <Avatar name={selectedAppointment.patientName} photo={selectedAppointment.patientProfile?.profilePhoto} size={58} radius={18} />
+                  <View style={{ flex: 1, marginLeft: 12 }}>
+                    <Text style={styles.sheetName}>{selectedAppointment.patientName}</Text>
+                    <Text style={styles.sheetSub}>{selectedAppointment.patientId?.email || ''}</Text>
+                  </View>
+                  <StatusBadge status={selectedAppointment.status || 'Pending'} />
+                </View>
+
+                <View style={styles.infoGrid}>
+                  {[
+                    ['Gender', selectedAppointment.patientProfile?.gender],
+                    ['Age', selectedAppointment.patientProfile?.age != null ? `${selectedAppointment.patientProfile.age} yrs` : null],
+                    ['Blood', selectedAppointment.patientProfile?.bloodGroup],
+                    ['Phone', selectedAppointment.patientPhone],
+                  ].map(([label, value]) => (
+                    <View key={label} style={styles.infoBox}>
+                      <Text style={styles.infoLabel}>{label}</Text>
+                      <Text style={styles.infoValue} numberOfLines={1}>{value || '—'}</Text>
+                    </View>
+                  ))}
+                </View>
+
+                <View style={styles.block}>
+                  <Text style={styles.blockLabel}>Reason for visit</Text>
+                  <Text style={styles.blockText}>{selectedAppointment.description || 'Not provided'}</Text>
+                </View>
+                <View style={styles.block}>
+                  <Text style={styles.blockLabel}>Address</Text>
+                  <Text style={styles.blockText}>{selectedAppointment.patientAddress || 'Not provided'}</Text>
+                </View>
+                {selectedAppointment.patientProfile?.emergencyContact?.name ? (
+                  <View style={styles.block}>
+                    <Text style={styles.blockLabel}>Emergency contact</Text>
+                    <Text style={styles.blockText}>
+                      {selectedAppointment.patientProfile.emergencyContact.name}
+                      {selectedAppointment.patientProfile.emergencyContact.relationship ? ` (${selectedAppointment.patientProfile.emergencyContact.relationship})` : ''}
+                      {selectedAppointment.patientProfile.emergencyContact.phone ? ` · ${selectedAppointment.patientProfile.emergencyContact.phone}` : ''}
+                    </Text>
+                  </View>
+                ) : null}
+
+                <View style={{ gap: 10, marginTop: 16 }}>
+                  {selectedAppointment.status === 'Completed' && (
+                    <Button
+                      title={selectedAppointment.hasPrescription ? 'Prescription added' : 'Attach prescription'}
+                      icon="document-text"
+                      disabled={selectedAppointment.hasPrescription}
+                      onPress={() => { setIsPatientModalVisible(false); navigation.navigate('AddPrescription', { appointment: selectedAppointment }); }}
+                    />
+                  )}
+                  <Button
+                    title="View medical records"
+                    icon="folder-open-outline"
+                    variant="secondary"
+                    onPress={() => {
+                      setIsPatientModalVisible(false);
+                      navigation.navigate('DoctorPatientRecords', {
+                        patientId: (selectedAppointment.patientId?._id || selectedAppointment.patientId).toString(),
+                        patientName: selectedAppointment.patientName,
+                      });
+                    }}
+                  />
+                </View>
+              </ScrollView>
+            )}
+          </Pressable>
+        </Pressable>
+      </Modal>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#F5F5F5',
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  loadingText: {
-    marginTop: 12,
-    color: '#666',
-    fontSize: 16,
-  },
-  headerWrapper: {
-    overflow: 'hidden',
-    borderBottomLeftRadius: 30,
-    borderBottomRightRadius: 30,
-    elevation: 10,
-    shadowColor: '#0077B6',
-    shadowOpacity: 0.3,
-    shadowOffset: { width: 0, height: 10 },
-    shadowRadius: 20,
-    backgroundColor: '#0077B6',
-  },
-  headerBgImage: {
-    ...StyleSheet.absoluteFillObject,
-    opacity: 0.4,
-  },
-  headerOverlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0, 119, 182, 0.6)',
-  },
-  headerSection: {
-    paddingHorizontal: 20,
-    paddingTop: 20,
-    paddingBottom: 15,
-  },
-  headerContent: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  doctorProfileSection: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 15,
-  },
-  profileImageWrapper: {
-    position: 'relative',
-  },
-  profileImage: {
-    width: 65,
-    height: 65,
-    borderRadius: 32.5,
-    borderWidth: 2,
-    borderColor: 'rgba(255, 255, 255, 0.8)',
-  },
-  profileImagePlaceholder: {
-    width: 65,
-    height: 65,
-    borderRadius: 32.5,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.3)',
-  },
-  onlineIndicator: {
-    position: 'absolute',
-    bottom: 2,
-    right: 2,
-    width: 14,
-    height: 14,
-    borderRadius: 7,
-    borderWidth: 2,
-    borderColor: '#0077B6',
-  },
-  availabilityToggleWrap: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'flex-end',
-    marginTop: 8,
-    gap: 10,
-    backgroundColor: 'rgba(0,0,0,0.15)',
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-    borderRadius: 20,
-    alignSelf: 'flex-end',
-  },
-  availabilityToggleLabel: {
-    color: '#FFF',
-    fontSize: 12,
-    fontWeight: '600',
-  },
-  nameContainer: {
-    justifyContent: 'center',
-  },
-  greetingRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    marginBottom: 2,
-  },
-  greetingText: {
-    fontSize: 13,
-    color: 'rgba(255, 255, 255, 0.9)',
-    fontWeight: '500',
-  },
-  doctorName: {
-    fontSize: 22,
-    fontWeight: '800',
-    color: '#FFFFFF',
-    letterSpacing: 0.5,
-  },
-  doctorDetails: {
-    fontSize: 12,
-    color: 'rgba(255, 255, 255, 0.8)',
-    marginTop: 2,
-    fontWeight: '500',
-  },
-  liveTime: {
-    fontSize: 11,
-    color: 'rgba(255, 255, 255, 0.6)',
-    marginTop: 2,
-    fontWeight: '600',
-  },
-  glassLogoutBtn: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    overflow: 'hidden',
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.3)',
-  },
-  glassContent: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  cardsGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    paddingHorizontal: 16,
-    paddingTop: 16,
-    paddingBottom: 10,
-    justifyContent: 'space-between',
-    gap: 10,
-  },
-  card: {
-    width: '48%',
-    backgroundColor: '#FFFFFF',
-    borderRadius: 14,
-    padding: 12,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-    shadowColor: '#0077B6',
-    shadowOpacity: 0.08,
-    shadowOffset: { width: 0, height: 4 },
-    shadowRadius: 8,
-    elevation: 3,
-    borderWidth: 1,
-    borderColor: 'rgba(0, 119, 182, 0.05)',
-  },
-  cardIconBg: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  cardTextWrap: {
-    flex: 1,
-  },
-  cardValue: {
-    fontSize: 18,
-    fontWeight: '800',
-    color: '#0077B6',
-    lineHeight: 22,
-  },
-  cardLabel: {
-    fontSize: 11,
-    color: '#666',
-    fontWeight: '500',
-  },
-  section: {
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-  },
-  sectionHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#1A1A1A',
-  },
-  calendarContainer: {
-    marginTop: 12,
-    backgroundColor: '#FFFFFF',
-    borderRadius: 16,
-    padding: 10,
-    shadowColor: '#0077B6',
-    shadowOpacity: 0.1,
-    shadowOffset: { width: 0, height: 8 },
-    shadowRadius: 15,
-    elevation: 5,
-  },
-  calendarLegend: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    marginTop: 12,
-    gap: 16,
-    paddingTop: 12,
-    borderTopWidth: 1,
-    borderTopColor: '#F0F0F0',
-  },
-  legendItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-  },
-  legendDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-  },
-  legendText: {
-    fontSize: 12,
-    color: '#666',
-  },
-  appointmentCount: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#0077B6',
-    backgroundColor: '#E3F2FD',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 6,
-  },
-  emptyState: {
-    alignItems: 'center',
-    paddingVertical: 40,
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    marginBottom: 12,
-  },
-  emptyStateText: {
-    marginTop: 12,
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
-  },
-  emptyStateSubtext: {
-    marginTop: 4,
-    fontSize: 13,
-    color: '#999',
-  },
-  appointmentCard: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    padding: 14,
-    marginBottom: 10,
-    borderLeftWidth: 4,
-    borderLeftColor: '#0077B6',
-    shadowColor: '#000',
-    shadowOpacity: 0.05,
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  appointmentHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginBottom: 10,
-  },
-  appointmentInfo: {
-    flex: 1,
-  },
-  patientName: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#1A1A1A',
-    marginBottom: 4,
-  },
-  appointmentTime: {
-    fontSize: 13,
-    color: '#666',
-  },
-  statusBadge: {
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 6,
-  },
-  statusBadgeText: {
-    color: '#FFFFFF',
-    fontSize: 12,
-    fontWeight: '600',
-  },
-  appointmentDesc: {
-    fontSize: 13,
-    color: '#666',
-    marginBottom: 12,
-    lineHeight: 18,
-  },
-  actionButtons: {
-    flexDirection: 'row',
-    gap: 8,
-  },
-  actionBtn: {
-    flex: 1,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingVertical: 10,
-    borderRadius: 8,
-    gap: 6,
-  },
-  acceptBtn: {
-    backgroundColor: '#34C759',
-  },
-  rejectBtn: {
-    backgroundColor: '#FF3B30',
-  },
-  completeBtn: {
-    backgroundColor: '#0077B6',
-  },
-  prescriptionBtn: {
-    backgroundColor: '#7B1FA2',
-    marginTop: 10,
-  },
-  disabledBtn: {
-    opacity: 0.6,
-  },
-  actionBtnText: {
-    color: '#FFFFFF',
-    fontSize: 12,
-    fontWeight: '600',
-  },
-  quickActionBtn: {
-    flexDirection: 'row',
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    padding: 14,
-    marginBottom: 10,
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOpacity: 0.05,
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  quickActionIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: '#E3F2FD',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 12,
-  },
-  quickActionText: {
-    flex: 1,
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#1A1A1A',
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'flex-end',
-  },
-  modalContent: {
-    backgroundColor: '#FFFFFF',
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
-    padding: 24,
-    maxHeight: '90%',
-  },
-  modalHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  modalTitle: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: '#1A1A1A',
-  },
-  modalBody: {
-    paddingBottom: 20,
-  },
-  modalPatientHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 24,
-  },
-  modalAvatarWrap: {
-    marginRight: 16,
-  },
-  modalAvatar: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-  },
-  modalAvatarPlaceholder: {
-    backgroundColor: '#0077B6',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  modalAvatarText: {
-    color: '#FFFFFF',
-    fontSize: 24,
-    fontWeight: '700',
-  },
-  modalPatientMeta: {
-    flex: 1,
-  },
-  modalPatientName: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: '#1A1A1A',
-    marginBottom: 4,
-  },
-  modalPatientEmail: {
-    fontSize: 14,
-    color: '#666',
-  },
-  modalInfoGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 12,
-    marginBottom: 24,
-  },
-  infoBox: {
-    width: '47%',
-    backgroundColor: '#F8F9FA',
-    padding: 12,
-    borderRadius: 12,
-  },
-  infoLabel: {
-    fontSize: 12,
-    color: '#666',
-    marginBottom: 4,
-  },
-  infoValue: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: '#1A1A1A',
-  },
-  modalSection: {
-    marginBottom: 20,
-    paddingBottom: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: '#F0F0F0',
-  },
-  modalSectionTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#1A1A1A',
-    marginBottom: 8,
-  },
-  modalSectionText: {
-    fontSize: 14,
-    color: '#444',
-    lineHeight: 22,
-  },
-  emergencyBox: {
-    backgroundColor: '#FFF0F0',
-    padding: 16,
-    borderRadius: 12,
-  },
-  emergencyText: {
-    fontSize: 14,
-    color: '#D32F2F',
-    marginBottom: 4,
-  },
+  container: { flex: 1, backgroundColor: colors.background },
+  loadingText: { marginTop: 12, color: colors.body },
+
+  headerRow: { flexDirection: 'row', alignItems: 'center' },
+  avatarWrap: { position: 'relative' },
+  avatar: { borderWidth: 2, borderColor: 'rgba(255,255,255,0.5)' },
+  onlineDot: { position: 'absolute', right: -2, bottom: -2, width: 16, height: 16, borderRadius: 8, borderWidth: 3, borderColor: colors.primary },
+  hello: { color: 'rgba(255,255,255,0.8)', fontSize: 13 },
+  name: { color: '#fff', fontSize: 21, fontWeight: '800' },
+  spec: { color: 'rgba(255,255,255,0.8)', fontSize: 12, marginTop: 2 },
+  availability: { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: 'rgba(255,255,255,0.14)', borderRadius: radius.lg, padding: 12, marginTop: 18 },
+  availDot: { width: 10, height: 10, borderRadius: 5 },
+  availTitle: { color: '#fff', fontWeight: '800', fontSize: 14 },
+  availSub: { color: 'rgba(255,255,255,0.75)', fontSize: 12, marginTop: 1 },
+
+  statsCard: { flexDirection: 'row', backgroundColor: colors.surface, marginHorizontal: 20, marginTop: -56, borderRadius: radius.lg, paddingVertical: 14, ...shadow.card },
+  stat: { flex: 1, alignItems: 'center' },
+  statBorder: { borderRightWidth: 1, borderRightColor: colors.border },
+  statIcon: { width: 32, height: 32, borderRadius: 10, alignItems: 'center', justifyContent: 'center' },
+  statValue: { fontSize: 20, fontWeight: '800', color: colors.ink, marginTop: 6 },
+  statLabel: { fontSize: 11, color: colors.muted, fontWeight: '600' },
+
+  body: { paddingHorizontal: 20 },
+  pendingNote: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: colors.warningSoft, borderRadius: radius.md, padding: 10, marginBottom: 12 },
+  pendingNoteText: { flex: 1, color: '#92400E', fontSize: 13, fontWeight: '600' },
+
+  apptCard: { marginBottom: 12, padding: 14 },
+  apptTop: { flexDirection: 'row', alignItems: 'center' },
+  timeTile: { width: 58, height: 58, borderRadius: 16, backgroundColor: colors.primarySoft, alignItems: 'center', justifyContent: 'center' },
+  timeTileText: { fontSize: 15, fontWeight: '800', color: colors.primary },
+  timeTileAmPm: { fontSize: 10, fontWeight: '800', color: colors.primary, opacity: 0.7 },
+  patientName: { fontSize: 15, fontWeight: '800', color: colors.ink },
+  apptReason: { fontSize: 12, color: colors.body, marginTop: 3 },
+  actionRow: { flexDirection: 'row', gap: 10, marginTop: 14 },
+
+  quickRow: { flexDirection: 'row', gap: 10 },
+  quickTile: { flex: 1, backgroundColor: colors.surface, borderRadius: radius.lg, padding: 12, alignItems: 'center', ...shadow.soft },
+  quickIcon: { width: 44, height: 44, borderRadius: 14, alignItems: 'center', justifyContent: 'center', marginBottom: 8 },
+  quickLabel: { fontSize: 12, fontWeight: '700', color: colors.ink, textAlign: 'center' },
+
+  legend: { flexDirection: 'row', justifyContent: 'center', gap: 16, paddingVertical: 10, borderTopWidth: 1, borderTopColor: colors.border, marginTop: 6 },
+  legendItem: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  legendDot: { width: 8, height: 8, borderRadius: 4 },
+  legendText: { fontSize: 12, color: colors.body },
+
+  overlay: { flex: 1, backgroundColor: 'rgba(6,30,34,0.55)', justifyContent: 'flex-end' },
+  sheet: { backgroundColor: '#fff', borderTopLeftRadius: 28, borderTopRightRadius: 28, padding: 20, paddingBottom: 34, maxHeight: '88%' },
+  handle: { width: 44, height: 5, borderRadius: 3, backgroundColor: colors.border, alignSelf: 'center', marginBottom: 16 },
+  sheetHead: { flexDirection: 'row', alignItems: 'center' },
+  sheetName: { fontSize: 18, fontWeight: '800', color: colors.ink },
+  sheetSub: { fontSize: 12, color: colors.body, marginTop: 2 },
+  infoGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 16 },
+  infoBox: { width: '48.5%', backgroundColor: colors.primarySoft, borderRadius: radius.md, padding: 12 },
+  infoLabel: { fontSize: 11, color: colors.body, fontWeight: '700' },
+  infoValue: { fontSize: 15, color: colors.ink, fontWeight: '800', marginTop: 2 },
+  block: { backgroundColor: colors.surfaceAlt, borderRadius: radius.md, padding: 12, marginTop: 10 },
+  blockLabel: { fontSize: 11, color: colors.body, fontWeight: '700', marginBottom: 4 },
+  blockText: { fontSize: 14, color: colors.ink, lineHeight: 20 },
 });

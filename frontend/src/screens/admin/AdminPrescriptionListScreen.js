@@ -47,7 +47,7 @@ export default function AdminPrescriptionListScreen({ navigation }) {
           <Text style={styles.patientName}>{item.patientId?.name || 'Unknown Patient'}</Text>
           <Text style={styles.dateText}>Date: {new Date(item.createdAt).toLocaleDateString()}</Text>
         </View>
-        <Ionicons name="chevron-forward" size={20} color="#0DB591" />
+        <Ionicons name="chevron-forward" size={20} color="#0C6875" />
       </View>
 
       <View style={styles.detailsRow}>
@@ -65,7 +65,7 @@ export default function AdminPrescriptionListScreen({ navigation }) {
               style={styles.editBtn}
               onPress={() => navigation.navigate('AdminPrescriptionEdit', { prescriptionId: item._id })}
             >
-              <Ionicons name="create-outline" size={20} color="#0DB591" />
+              <Ionicons name="create-outline" size={20} color="#0C6875" />
             </TouchableOpacity>
             <TouchableOpacity 
               style={styles.deleteBtn}
@@ -101,14 +101,14 @@ export default function AdminPrescriptionListScreen({ navigation }) {
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
-          <Ionicons name="arrow-back" size={24} color="#1A4B44" />
+          <Ionicons name="arrow-back" size={24} color="#0F2A2E" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Manage Prescriptions</Text>
         <View style={{ width: 24 }} />
       </View>
 
       {loading ? (
-        <ActivityIndicator size="large" color="#0DB591" style={{ marginTop: 50 }} />
+        <ActivityIndicator size="large" color="#0C6875" style={{ marginTop: 50 }} />
       ) : (
         <FlatList
           data={prescriptions}
@@ -124,7 +124,7 @@ export default function AdminPrescriptionListScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#F2FAF8' },
+  container: { flex: 1, backgroundColor: '#F3F7F8' },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -134,7 +134,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#E8F3F0',
   },
-  headerTitle: { fontSize: 18, fontWeight: 'bold', color: '#1A4B44' },
+  headerTitle: { fontSize: 18, fontWeight: 'bold', color: '#0F2A2E' },
   backBtn: { padding: 5 },
   list: { padding: 15, paddingBottom: 20 },
   card: {
@@ -149,12 +149,12 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
   },
   cardHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 15 },
-  patientName: { fontSize: 16, fontWeight: 'bold', color: '#1A4B44' },
+  patientName: { fontSize: 16, fontWeight: 'bold', color: '#0F2A2E' },
   dateText: { fontSize: 12, color: '#666', marginTop: 4 },
   detailsRow: { flexDirection: 'row', justifyContent: 'space-between', borderTopWidth: 1, borderTopColor: '#F0F0F0', paddingTop: 15 },
   detailLabel: { fontSize: 12, color: '#666', marginBottom: 4 },
   detailValue: { fontSize: 14, fontWeight: '600', color: '#333' },
-  medValue: { fontSize: 14, fontWeight: 'bold', color: '#0DB591' },
+  medValue: { fontSize: 14, fontWeight: 'bold', color: '#0C6875' },
   emptyText: { textAlign: 'center', marginTop: 50, color: '#666', fontSize: 16 },
   deleteBtn: {
     padding: 8,

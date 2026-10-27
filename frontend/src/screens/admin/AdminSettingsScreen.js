@@ -57,7 +57,7 @@ export default function AdminSettingsScreen({ navigation }) {
   if (loading) {
     return (
       <View style={styles.center}>
-        <ActivityIndicator size="large" color="#0DB591" />
+        <ActivityIndicator size="large" color="#0C6875" />
       </View>
     );
   }
@@ -78,7 +78,7 @@ export default function AdminSettingsScreen({ navigation }) {
           <View style={styles.card}>
             <View style={styles.settingRow}>
               <View style={styles.settingInfo}>
-                <MaterialCommunityIcons name="calendar-clock" size={24} color="#0DB591" />
+                <MaterialCommunityIcons name="calendar-clock" size={24} color="#0C6875" />
                 <View style={styles.settingTextContent}>
                   <Text style={styles.settingLabel}>Anytime Booking</Text>
                   <Text style={styles.settingDesc}>Allow patients to book appointments for today or anytime before treatment.</Text>
@@ -87,7 +87,7 @@ export default function AdminSettingsScreen({ navigation }) {
               <Switch
                 value={allowAnytime}
                 onValueChange={setAllowAnytime}
-                trackColor={{ false: '#D1D1D1', true: '#0DB591' }}
+                trackColor={{ false: '#D1D1D1', true: '#0C6875' }}
               />
             </View>
             
@@ -99,9 +99,9 @@ export default function AdminSettingsScreen({ navigation }) {
             )}
             
             {allowAnytime && (
-              <View style={[styles.infoBox, { backgroundColor: '#E8F5F1' }]}>
-                <Ionicons name="checkmark-circle-outline" size={18} color="#0DB591" />
-                <Text style={[styles.infoText, { color: '#0DB591' }]}>Same-day and immediate booking enabled for patients.</Text>
+              <View style={[styles.infoBox, { backgroundColor: '#E7F1F2' }]}>
+                <Ionicons name="checkmark-circle-outline" size={18} color="#0C6875" />
+                <Text style={[styles.infoText, { color: '#0C6875' }]}>Same-day and immediate booking enabled for patients.</Text>
               </View>
             )}
           </View>
@@ -121,7 +121,7 @@ export default function AdminSettingsScreen({ navigation }) {
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>Manage Holidays</Text>
             <TouchableOpacity onPress={() => Alert.alert('Add Holiday', 'Feature to add holidays coming soon in the next update!')}>
-              <Ionicons name="add-circle-outline" size={20} color="#0DB591" />
+              <Ionicons name="add-circle-outline" size={20} color="#0C6875" />
             </TouchableOpacity>
           </View>
           <View style={styles.card}>
@@ -190,17 +190,17 @@ const styles = StyleSheet.create({
   infoText: { fontSize: 12, color: '#666', flex: 1 },
   statusRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   statusLabel: { fontSize: 14, color: '#666' },
-  statusValue: { fontSize: 14, fontWeight: '700', color: '#0DB591' },
+  statusValue: { fontSize: 14, fontWeight: '700', color: '#0C6875' },
   sectionHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 },
   holidayRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 12 },
   rowBorder: { borderTopWidth: 1, borderTopColor: '#F0F4F8' },
   holidayName: { fontSize: 14, fontWeight: '700', color: '#1A2B4A' },
   holidayDate: { fontSize: 12, color: '#666', marginTop: 2 },
-  holidayBadge: { backgroundColor: '#E8F5F1', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 8 },
-  holidayBadgeText: { fontSize: 10, fontWeight: '700', color: '#0DB591', textTransform: 'uppercase' },
+  holidayBadge: { backgroundColor: '#E7F1F2', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 8 },
+  holidayBadgeText: { fontSize: 10, fontWeight: '700', color: '#0C6875', textTransform: 'uppercase' },
   emptyText: { fontSize: 13, color: '#999', textAlign: 'center', paddingVertical: 20 },
   footer: { padding: 16, backgroundColor: '#FFF', borderTopWidth: 1, borderTopColor: '#EFF3F6' },
-  saveBtn: { backgroundColor: '#0DB591', height: 52, borderRadius: 12, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 },
+  saveBtn: { backgroundColor: '#0C6875', height: 52, borderRadius: 12, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 },
   saveBtnText: { color: '#FFF', fontSize: 16, fontWeight: '700' },
   disabledBtn: { opacity: 0.6 }
 });

@@ -130,7 +130,7 @@ export default function RatingScreen({ navigation, route }) {
       {/* Premium Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn} activeOpacity={0.7}>
-          <Ionicons name="arrow-back" size={24} color="#1A4B44" />
+          <Ionicons name="arrow-back" size={24} color="#0F2A2E" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Feedback</Text>
         <View style={{ width: 40 }} />
@@ -144,7 +144,7 @@ export default function RatingScreen({ navigation, route }) {
           
           <View style={styles.heroSection}>
             <View style={styles.iconCircle}>
-              <MaterialCommunityIcons name="heart-pulse" size={32} color="#0DB591" />
+              <MaterialCommunityIcons name="heart-pulse" size={32} color="#0C6875" />
             </View>
             <Text style={styles.heroTitle}>How was your visit?</Text>
             <Text style={styles.heroSub}>
@@ -175,7 +175,7 @@ export default function RatingScreen({ navigation, route }) {
           {/* Quick Feedback Chips */}
           <View style={styles.card}>
             <View style={styles.cardHeaderRow}>
-              <Ionicons name="flash-outline" size={18} color="#1A4B44" />
+              <Ionicons name="flash-outline" size={18} color="#0F2A2E" />
               <Text style={styles.cardTitle}>Quick Feedback</Text>
             </View>
             <View style={styles.chipsWrap}>
@@ -206,7 +206,7 @@ export default function RatingScreen({ navigation, route }) {
           {/* Specific Ratings */}
           <View style={styles.card}>
             <View style={styles.cardHeaderRow}>
-              <Ionicons name="analytics-outline" size={18} color="#1A4B44" />
+              <Ionicons name="analytics-outline" size={18} color="#0F2A2E" />
               <Text style={styles.cardTitle}>Detailed Ratings</Text>
             </View>
 
@@ -248,7 +248,7 @@ export default function RatingScreen({ navigation, route }) {
           {/* Written Review */}
           <View style={styles.card}>
             <View style={styles.cardHeaderRow}>
-              <Ionicons name="chatbox-ellipses-outline" size={18} color="#1A4B44" />
+              <Ionicons name="chatbox-ellipses-outline" size={18} color="#0F2A2E" />
               <Text style={styles.cardTitle}>Additional Comments</Text>
             </View>
             <TextInput
@@ -278,7 +278,7 @@ export default function RatingScreen({ navigation, route }) {
           </View>
 
           <View style={styles.securityNote}>
-            <Ionicons name="shield-checkmark" size={16} color="#0DB591" />
+            <Ionicons name="shield-checkmark" size={16} color="#0C6875" />
             <Text style={styles.securityText}>
               Your data is encrypted and securely processed.
             </Text>
@@ -333,7 +333,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#1A4B44',
+    color: '#0F2A2E',
   },
   scrollContent: {
     padding: 16,
@@ -347,7 +347,7 @@ const styles = StyleSheet.create({
     width: 64,
     height: 64,
     borderRadius: 32,
-    backgroundColor: '#E8F8F5',
+    backgroundColor: '#E7F1F2',
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 16,
@@ -390,12 +390,12 @@ const styles = StyleSheet.create({
   cardTitle: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#1A4B44',
+    color: '#0F2A2E',
   },
   cardTitleCenter: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#1A4B44',
+    color: '#0F2A2E',
     textAlign: 'center',
     marginBottom: 20,
   },
@@ -417,7 +417,7 @@ const styles = StyleSheet.create({
     color: '#94A3B8',
   },
   ratingHintActive: {
-    color: '#0DB591',
+    color: '#0C6875',
     fontWeight: '700',
   },
   chipsWrap: {
@@ -436,8 +436,8 @@ const styles = StyleSheet.create({
     borderRadius: 100,
   },
   chipActive: {
-    backgroundColor: '#0DB591',
-    borderColor: '#0DB591',
+    backgroundColor: '#0C6875',
+    borderColor: '#0C6875',
   },
   chipText: {
     fontSize: 13,
@@ -508,8 +508,8 @@ const styles = StyleSheet.create({
     marginRight: 12,
   },
   checkboxActive: {
-    backgroundColor: '#0DB591',
-    borderColor: '#0DB591',
+    backgroundColor: '#0C6875',
+    borderColor: '#0C6875',
   },
   toggleTextWrap: {
     flex: 1,
@@ -545,12 +545,12 @@ const styles = StyleSheet.create({
     paddingBottom: Platform.OS === 'ios' ? 34 : 16,
   },
   submitBtn: {
-    backgroundColor: '#0DB591',
+    backgroundColor: '#0C6875',
     paddingVertical: 16,
     borderRadius: 16,
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#0DB591',
+    shadowColor: '#0C6875',
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.25,
     shadowRadius: 12,

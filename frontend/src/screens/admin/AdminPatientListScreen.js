@@ -103,7 +103,7 @@ export default function AdminPatientListScreen({ navigation }) {
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
-          <Ionicons name="arrow-back" size={24} color="#1A4B44" />
+          <Ionicons name="arrow-back" size={24} color="#0F2A2E" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Manage Patients</Text>
         <View style={{ width: 24 }} />
@@ -120,7 +120,7 @@ export default function AdminPatientListScreen({ navigation }) {
       </View>
 
       {loading ? (
-        <ActivityIndicator size="large" color="#0DB591" style={{ marginTop: 50 }} />
+        <ActivityIndicator size="large" color="#0C6875" style={{ marginTop: 50 }} />
       ) : (
         <FlatList
           data={filteredPatients}
@@ -138,7 +138,7 @@ export default function AdminPatientListScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#F2FAF8' },
+  container: { flex: 1, backgroundColor: '#F3F7F8' },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -148,7 +148,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#E8F3F0',
   },
-  headerTitle: { fontSize: 18, fontWeight: 'bold', color: '#1A4B44' },
+  headerTitle: { fontSize: 18, fontWeight: 'bold', color: '#0F2A2E' },
   backBtn: { padding: 5 },
   searchContainer: {
     flexDirection: 'row',
@@ -175,10 +175,10 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
   },
   cardHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: 15 },
-  avatar: { width: 46, height: 46, borderRadius: 23, backgroundColor: '#E8F8F5', justifyContent: 'center', alignItems: 'center', marginRight: 12 },
-  avatarText: { fontSize: 18, fontWeight: 'bold', color: '#0DB591' },
+  avatar: { width: 46, height: 46, borderRadius: 23, backgroundColor: '#E7F1F2', justifyContent: 'center', alignItems: 'center', marginRight: 12 },
+  avatarText: { fontSize: 18, fontWeight: 'bold', color: '#0C6875' },
   info: { flex: 1 },
-  name: { fontSize: 16, fontWeight: 'bold', color: '#1A4B44', marginBottom: 2 },
+  name: { fontSize: 16, fontWeight: 'bold', color: '#0F2A2E', marginBottom: 2 },
   email: { fontSize: 13, color: '#666' },
   deleteBtn: { padding: 8, backgroundColor: '#FFF0F0', borderRadius: 8 },
   detailsRow: { flexDirection: 'row', justifyContent: 'space-between', borderTopWidth: 1, borderTopColor: '#F0F0F0', paddingTop: 15 },

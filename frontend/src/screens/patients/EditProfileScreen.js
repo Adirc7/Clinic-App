@@ -163,7 +163,7 @@ export default function EditProfileScreen({ navigation, route, onProfileCreated 
 
       <ScrollView style={styles.form} showsVerticalScrollIndicator={false}>
         <View style={styles.notice}>
-          <Ionicons name="information-circle" size={24} color="#0DB591" />
+          <Ionicons name="information-circle" size={24} color="#0C6875" />
           <Text style={styles.noticeText}>
             {isUpdate ? 'Keep your medical records up to date for better care.' : 'Please complete your profile to enable appointment booking.'}
           </Text>
@@ -175,7 +175,7 @@ export default function EditProfileScreen({ navigation, route, onProfileCreated 
             {profilePhoto ? (
               <Image source={{ uri: profilePhoto }} style={styles.profileImage} />
             ) : (
-              <Ionicons name="camera" size={32} color="#A3B5B3" />
+              <Ionicons name="camera" size={32} color="#8AA0A3" />
             )}
           </TouchableOpacity>
           <Text style={styles.imageHint}>Tap to upload profile photo</Text>
@@ -272,17 +272,17 @@ export default function EditProfileScreen({ navigation, route, onProfileCreated 
       <Modal visible={customAlert.visible} transparent animationType="fade" onRequestClose={() => setCustomAlert({ ...customAlert, visible: false })}>
         <View style={styles.alertOverlay}>
           <View style={styles.alertBox}>
-            <View style={[styles.alertIcon, { backgroundColor: customAlert.type === 'success' ? '#E8F5F1' : customAlert.type === 'error' ? '#FFEBEE' : '#FFF3E0' }]}>
+            <View style={[styles.alertIcon, { backgroundColor: customAlert.type === 'success' ? '#E7F1F2' : customAlert.type === 'error' ? '#FFEBEE' : '#FFF3E0' }]}>
               <Ionicons 
                 name={customAlert.type === 'success' ? "checkmark-circle" : customAlert.type === 'error' ? "close-circle" : "warning"} 
                 size={34} 
-                color={customAlert.type === 'success' ? "#0DB591" : customAlert.type === 'error' ? "#E53935" : "#FF9800"} 
+                color={customAlert.type === 'success' ? "#0C6875" : customAlert.type === 'error' ? "#E53935" : "#FF9800"} 
               />
             </View>
             <Text style={styles.alertTitle}>{customAlert.title}</Text>
             <Text style={styles.alertMsg}>{customAlert.message}</Text>
             <TouchableOpacity 
-              style={[styles.alertBtn, { backgroundColor: customAlert.type === 'success' ? '#0DB591' : customAlert.type === 'error' ? '#E53935' : '#FF9800' }]} 
+              style={[styles.alertBtn, { backgroundColor: customAlert.type === 'success' ? '#0C6875' : customAlert.type === 'error' ? '#E53935' : '#FF9800' }]} 
               onPress={() => {
                 setCustomAlert({ ...customAlert, visible: false });
                 if (customAlert.type === 'success') {
@@ -307,7 +307,7 @@ const styles = StyleSheet.create({
   form: { padding: 20 },
   notice: {
     flexDirection: 'row',
-    backgroundColor: '#E8F8F5',
+    backgroundColor: '#E7F1F2',
     padding: 15,
     borderRadius: 12,
     marginBottom: 20,
@@ -357,7 +357,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#FFF',
   },
-  genderBtnActive: { backgroundColor: '#0DB591', borderColor: '#0DB591' },
+  genderBtnActive: { backgroundColor: '#0C6875', borderColor: '#0C6875' },
   genderText: { color: '#666', fontWeight: '600' },
   genderTextActive: { color: '#FFF' },
   imagePickerContainer: {
@@ -368,12 +368,12 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     borderRadius: 50,
-    backgroundColor: '#E8F8F5',
+    backgroundColor: '#E7F1F2',
     justifyContent: 'center',
     alignItems: 'center',
     overflow: 'hidden',
     borderWidth: 2,
-    borderColor: '#0DB591',
+    borderColor: '#0C6875',
   },
   profileImage: {
     width: '100%',
@@ -385,7 +385,7 @@ const styles = StyleSheet.create({
     color: '#666',
   },
   saveBtn: {
-    backgroundColor: '#0DB591',
+    backgroundColor: '#0C6875',
     paddingVertical: 15,
     borderRadius: 12,
     alignItems: 'center',

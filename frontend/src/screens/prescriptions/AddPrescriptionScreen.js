@@ -75,7 +75,7 @@ export default function AddPrescriptionScreen({ route, navigation }) {
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
-          <Ionicons name="arrow-back" size={24} color="#1A4B44" />
+          <Ionicons name="arrow-back" size={24} color="#0F2A2E" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Write Prescription</Text>
         <View style={{ width: 24 }} />
@@ -107,7 +107,7 @@ export default function AddPrescriptionScreen({ route, navigation }) {
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>Medications</Text>
           <TouchableOpacity onPress={handleAddMedication} style={styles.addBtn}>
-            <Ionicons name="add" size={18} color="#0DB591" />
+            <Ionicons name="add" size={18} color="#0C6875" />
             <Text style={styles.addBtnText}>Add</Text>
           </TouchableOpacity>
         </View>
@@ -177,7 +177,7 @@ export default function AddPrescriptionScreen({ route, navigation }) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#F2FAF8' },
+  container: { flex: 1, backgroundColor: '#F3F7F8' },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -187,28 +187,28 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#E8F3F0',
   },
-  headerTitle: { fontSize: 18, fontWeight: 'bold', color: '#1A4B44' },
+  headerTitle: { fontSize: 18, fontWeight: 'bold', color: '#0F2A2E' },
   backBtn: { padding: 5 },
   scroll: { padding: 20 },
   infoBox: {
-    backgroundColor: '#E8F8F5',
+    backgroundColor: '#E7F1F2',
     padding: 15,
     borderRadius: 12,
     marginBottom: 20,
   },
   infoLabel: { fontSize: 14, color: '#666', marginBottom: 4 },
-  infoValue: { fontWeight: 'bold', color: '#1A4B44' },
+  infoValue: { fontWeight: 'bold', color: '#0F2A2E' },
   sectionHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 15 },
-  sectionTitle: { fontSize: 16, fontWeight: 'bold', color: '#1A4B44' },
-  addBtn: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#FFF', paddingHorizontal: 10, paddingVertical: 5, borderRadius: 20, borderWidth: 1, borderColor: '#0DB591' },
-  addBtnText: { color: '#0DB591', fontWeight: '600', marginLeft: 4 },
+  sectionTitle: { fontSize: 16, fontWeight: 'bold', color: '#0F2A2E' },
+  addBtn: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#FFF', paddingHorizontal: 10, paddingVertical: 5, borderRadius: 20, borderWidth: 1, borderColor: '#0C6875' },
+  addBtnText: { color: '#0C6875', fontWeight: '600', marginLeft: 4 },
   medCard: { backgroundColor: '#FFF', padding: 15, borderRadius: 12, marginBottom: 15, elevation: 1 },
   medHeader: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 10 },
   medIndex: { fontWeight: 'bold', color: '#666' },
   input: { backgroundColor: '#F9F9F9', borderWidth: 1, borderColor: '#E8E8E8', borderRadius: 8, padding: 12, marginBottom: 10, fontSize: 14 },
   row: { flexDirection: 'row', gap: 10 },
   textArea: { height: 100, textAlignVertical: 'top' },
-  submitBtn: { backgroundColor: '#0DB591', padding: 15, borderRadius: 12, alignItems: 'center', marginTop: 10 },
+  submitBtn: { backgroundColor: '#0C6875', padding: 15, borderRadius: 12, alignItems: 'center', marginTop: 10 },
   submitBtnText: { color: '#FFF', fontSize: 16, fontWeight: 'bold' },
   errorText: { color: '#FF3B30', fontSize: 12 },
   inputError: { borderColor: '#FF3B30' },

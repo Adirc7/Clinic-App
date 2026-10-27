@@ -28,10 +28,10 @@ export default function FormInput({
     <View style={styles.wrapper}>
       {label ? <Text style={styles.label}>{label}</Text> : null}
       <View style={[styles.inputWrap, hasError && styles.inputWrapError, style]}>
-        {icon ? <Ionicons name={icon} size={18} color={hasError ? '#E74C3C' : '#87A2A0'} /> : null}
+        {icon ? <Ionicons name={icon} size={18} color={hasError ? '#E74C3C' : '#8AA0A3'} /> : null}
         <TextInput
           style={styles.input}
-          placeholderTextColor="#A3B5B3"
+          placeholderTextColor="#8AA0A3"
           {...rest}
         />
         {rightElement || null}
@@ -53,7 +53,7 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#1A4B44',
+    color: '#0F2A2E',
     marginBottom: 6,
   },
   inputWrap: {
@@ -61,11 +61,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 10,
     borderWidth: 1.5,
-    borderColor: '#DCEBE8',
+    borderColor: '#E3ECEE',
     borderRadius: 14,
     paddingHorizontal: 14,
     height: 52,
-    backgroundColor: '#FBFEFD',
+    backgroundColor: '#F8FBFB',
   },
   inputWrapError: {
     borderColor: '#E74C3C',
@@ -73,7 +73,7 @@ const styles = StyleSheet.create({
   },
   input: {
     flex: 1,
-    color: '#123F39',
+    color: '#0F2A2E',
     fontSize: 14,
   },
   errorRow: {

@@ -1,42 +1,33 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import {
-  View, Text, StyleSheet, ScrollView, TouchableOpacity,
-  ActivityIndicator, Alert, RefreshControl, Modal, Platform
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import React, { useCallback, useEffect, useState } from 'react';
+import { ActivityIndicator, Alert, Modal, Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { doctorName } from '../../theme';
-import axiosInstance from '../../api/axiosInstance';
+import axiosInstance, { getErrorMessage } from '../../api/axiosInstance';
+import { Button, Card, EmptyState, GradientHeader, StatusBadge } from '../../components/ui';
+import { colors, doctorName, radius } from '../../theme';
+
+const money = (n) => `Rs. ${Number(n || 0).toLocaleString('en-LK', { maximumFractionDigits: 2 })}`;
+const fmtDate = (d) => new Date(d).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
 
 export default function PatientBillingScreen({ navigation, route }) {
   const appointmentId = route?.params?.appointmentId;
 
-  const [invoice, setInvoice] = useState(null);
   const [invoices, setInvoices] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [paying, setPaying] = useState(false);
-  const [selectedInvoice, setSelectedInvoice] = useState(null);
-  const [modalVisible, setModalVisible] = useState(false);
+  const [selected, setSelected] = useState(null);
 
   const fetchData = useCallback(async () => {
     try {
-      setLoading(true);
       if (appointmentId) {
-        // Fetch specific bill for this appointment
         const res = await axiosInstance.get(`/billing/by-appointment/${appointmentId}`);
-        setInvoice(res.data);
+        setInvoices(res.data ? [res.data] : []);
       } else {
-        // Fetch all patient bills (fallback)
         const res = await axiosInstance.get('/billing/my-billing');
         setInvoices(res.data || []);
       }
     } catch (error) {
-      if (error.response?.status === 404) {
-        setInvoice(null);
-      } else {
-        console.error('Billing fetch error:', error);
-      }
+      if (error.response?.status === 404) setInvoices([]);
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -45,307 +36,192 @@ export default function PatientBillingScreen({ navigation, route }) {
 
   useEffect(() => {
     fetchData();
-  }, [fetchData]);
+    return navigation.addListener('focus', fetchData);
+  }, [navigation, fetchData]);
 
   const handlePay = (inv) => {
-    Alert.alert(
-      'Confirm Payment',
-      `Pay Rs. ${inv.amount} for your consultation?`,
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Pay Now',
-          onPress: async () => {
-            try {
-              setPaying(true);
-              await axiosInstance.put(`/billing/${inv._id}/status`, { status: 'Paid', paymentMethod: 'Online' });
-              Alert.alert('✅ Payment Successful', 'Your bill has been marked as paid.');
-              fetchData();
-            } catch (_) {
-              Alert.alert('Error', 'Payment failed. Please try again or pay at reception.');
-            } finally {
-              setPaying(false);
-            }
-          },
+    Alert.alert('Confirm payment', `Pay ${money(inv.amount)} for your consultation?`, [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Pay now',
+        onPress: async () => {
+          try {
+            setPaying(true);
+            await axiosInstance.put(`/billing/${inv._id}/status`, { status: 'Paid', paymentMethod: 'Online' });
+            setSelected(null);
+            Alert.alert('✅ Payment successful', 'Your bill has been marked as paid.');
+            fetchData();
+          } catch (error) {
+            Alert.alert('Payment failed', getErrorMessage(error, 'Please try again or pay at reception.'));
+          } finally {
+            setPaying(false);
+          }
         },
-      ]
-    );
+      },
+    ]);
   };
 
-  const InvoiceCard = ({ inv }) => (
-    <TouchableOpacity style={s.invoiceCard} onPress={() => { setSelectedInvoice(inv); setModalVisible(true); }}>
-      {/* Header */}
-      <View style={s.invoiceHeader}>
-        <View style={s.invoiceTitleBlock}>
-          <Text style={s.invoiceTitle}>Consultation Invoice</Text>
-          <Text style={s.invoiceDate}>
-            {new Date(inv.date || inv.createdAt).toLocaleDateString('en-US', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })}
-          </Text>
-        </View>
-        <View style={[s.statusBadge, inv.status === 'Paid' ? s.badgePaid : s.badgePending]}>
-          <Text style={[s.statusText, inv.status === 'Paid' ? s.textPaid : s.textPending]}>
-            {inv.status}
-          </Text>
-        </View>
-      </View>
+  const outstanding = invoices.filter((i) => i.status === 'Pending' || i.status === 'Overdue');
+  const outstandingTotal = outstanding.reduce((sum, i) => sum + Number(i.amount || 0), 0);
+  const paidTotal = invoices.filter((i) => i.status === 'Paid').reduce((sum, i) => sum + Number(i.amount || 0), 0);
 
-      <View style={s.summaryRow}>
-        <View style={s.docMiniInfo}>
-          <Ionicons name="person" size={14} color="#0DB591" />
-          <Text style={s.docMiniName}>
-            {inv.doctorId?.name ? doctorName(inv.doctorId.name) : 'Doctor'}
-          </Text>
-        </View>
-        <Text style={s.summaryAmount}>Rs. {inv.amount}</Text>
-      </View>
-      
-      <View style={s.viewDetailsAction}>
-        <Text style={s.viewDetailsText}>Tap to view details</Text>
-        <Ionicons name="chevron-forward" size={14} color="#999" />
-      </View>
-    </TouchableOpacity>
-  );
+  const lines = (inv) =>
+    [
+      ['Consultation fee', inv.consultationFee],
+      ['Service charge', inv.serviceCharge],
+      ['Treatment charge', inv.treatmentCharge],
+      ...(inv.items || []).map((it) => [it.description, it.amount]),
+      ['Medicines', inv.medicineFee],
+      ['Other charges', inv.otherCharges],
+    ].filter(([, v]) => Number(v) > 0);
 
   return (
-    <SafeAreaView style={s.safe}>
-      <View style={s.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={s.backBtn}>
-          <Ionicons name="arrow-back" size={20} color="#0A6B5B" />
-        </TouchableOpacity>
-        <Text style={s.headerTitle}>My Bill</Text>
-        <View style={{ width: 36 }} />
-      </View>
+    <View style={styles.screen}>
+      <GradientHeader style={{ paddingBottom: 24 }}>
+        {appointmentId ? (
+          <Pressable onPress={() => navigation.goBack()} hitSlop={10} style={styles.back}>
+            <Ionicons name="chevron-back" size={20} color="#fff" />
+          </Pressable>
+        ) : null}
+        <Text style={styles.title}>{appointmentId ? 'Visit bill' : 'Bills & payments'}</Text>
+        <View style={styles.summary}>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.sumLabel}>Outstanding</Text>
+            <Text style={styles.sumValue}>{money(outstandingTotal)}</Text>
+            <Text style={styles.sumHint}>{outstanding.length} unpaid bill{outstanding.length === 1 ? '' : 's'}</Text>
+          </View>
+          <View style={styles.sumDivider} />
+          <View style={{ flex: 1, paddingLeft: 16 }}>
+            <Text style={styles.sumLabel}>Paid so far</Text>
+            <Text style={[styles.sumValue, { fontSize: 18 }]}>{money(paidTotal)}</Text>
+          </View>
+        </View>
+      </GradientHeader>
 
       {loading ? (
-        <ActivityIndicator size="large" color="#0DB591" style={{ marginTop: 60 }} />
+        <ActivityIndicator size="large" color={colors.primary} style={{ marginTop: 40 }} />
       ) : (
         <ScrollView
-          contentContainerStyle={s.scroll}
-          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => { setRefreshing(true); fetchData(); }} colors={['#0DB591']} />}
+          contentContainerStyle={styles.list}
+          showsVerticalScrollIndicator={false}
+          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => { setRefreshing(true); fetchData(); }} colors={[colors.primary]} tintColor={colors.primary} />}
         >
-          {appointmentId ? (
-            invoice ? (
-              <InvoiceCard inv={invoice} />
-            ) : (
-              <View style={s.empty}>
-                <Ionicons name="receipt-outline" size={52} color="#D1D1D1" />
-                <Text style={s.emptyTitle}>No Bill Yet</Text>
-                <Text style={s.emptyText}>No invoice has been generated for this appointment yet. It will appear here once created by the admin.</Text>
-              </View>
-            )
+          {invoices.length === 0 ? (
+            <EmptyState
+              icon="receipt-outline"
+              title={appointmentId ? 'No bill yet' : 'No bills yet'}
+              message={appointmentId ? 'The bill for this visit will appear here once the clinic creates it.' : 'Bills appear here after your visits.'}
+            />
           ) : (
-            invoices.length > 0 ? (
-              invoices.map(inv => <InvoiceCard key={inv._id} inv={inv} />)
-            ) : (
-              <View style={s.empty}>
-                <Ionicons name="receipt-outline" size={52} color="#D1D1D1" />
-                <Text style={s.emptyTitle}>No Invoices</Text>
-                <Text style={s.emptyText}>You have no billing records yet.</Text>
-              </View>
-            )
+            invoices.map((inv) => {
+              const pending = inv.status === 'Pending' || inv.status === 'Overdue';
+              return (
+                <Card key={inv._id} style={styles.card} onPress={() => setSelected(inv)}>
+                  <View style={styles.cardTop}>
+                    <View style={[styles.iconBox, { backgroundColor: pending ? colors.warningSoft : colors.successSoft }]}>
+                      <Ionicons name={pending ? 'receipt' : 'checkmark-done'} size={20} color={pending ? colors.warning : colors.success} />
+                    </View>
+                    <View style={{ flex: 1, marginLeft: 12 }}>
+                      <Text style={styles.cardTitle} numberOfLines={1}>{inv.doctorId?.name ? doctorName(inv.doctorId.name) : 'Consultation'}</Text>
+                      <Text style={styles.cardSub}>{inv.doctorId?.specialization || 'Consultation'} · {fmtDate(inv.date || inv.createdAt)}</Text>
+                    </View>
+                    <StatusBadge status={inv.status} />
+                  </View>
+                  <View style={styles.cardBottom}>
+                    <Text style={styles.amount}>{money(inv.amount)}</Text>
+                    {pending ? (
+                      <Button title="Pay now" small icon="card-outline" onPress={() => handlePay(inv)} loading={paying} style={{ paddingHorizontal: 4 }} />
+                    ) : (
+                      <Text style={styles.paidOn}>{inv.paidAt ? `Paid ${fmtDate(inv.paidAt)}` : 'Paid'}{inv.paymentMethod ? ` · ${inv.paymentMethod}` : ''}</Text>
+                    )}
+                  </View>
+                </Card>
+              );
+            })
           )}
-          <View style={{ height: 40 }} />
         </ScrollView>
       )}
 
-      {/* ── BILL DETAILS MODAL ── */}
-      <Modal
-        visible={modalVisible}
-        transparent
-        animationType="slide"
-        onRequestClose={() => setModalVisible(false)}
-      >
-        <View style={s.modalOverlay}>
-          <View style={s.modalContent}>
-            <View style={s.modalHeader}>
-              <Text style={s.modalTitle}>Invoice Details</Text>
-              <TouchableOpacity onPress={() => setModalVisible(false)}>
-                <Ionicons name="close" size={24} color="#333" />
-              </TouchableOpacity>
-            </View>
-
-            {selectedInvoice && (
+      {/* ── RECEIPT SHEET ── */}
+      <Modal visible={!!selected} transparent animationType="slide" onRequestClose={() => setSelected(null)}>
+        <Pressable style={styles.overlay} onPress={() => setSelected(null)}>
+          <Pressable style={styles.sheet} onPress={() => {}}>
+            <View style={styles.handle} />
+            {selected && (
               <ScrollView showsVerticalScrollIndicator={false}>
-                <View style={s.modalBody}>
-                  {/* Doctor & Date */}
-                  <View style={s.modalInfoSection}>
-                    <Text style={s.modalDocName}>
-                      {selectedInvoice.doctorId?.name ? doctorName(selectedInvoice.doctorId.name) : 'Doctor'}
-                    </Text>
-                    <Text style={s.modalDocSpec}>{selectedInvoice.doctorId?.specialization}</Text>
-                    <Text style={s.modalDate}>
-                      {new Date(selectedInvoice.date || selectedInvoice.createdAt).toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' })}
-                    </Text>
-                  </View>
-
-                  {/* Appointment & Patient IDs */}
-                  <View style={s.modalIdBlock}>
-                    <View style={s.modalIdItem}>
-                      <Text style={s.modalIdLabel}>Appointment ID:</Text>
-                      <Text style={s.modalIdValue}>{selectedInvoice.appointmentId?._id || selectedInvoice.appointmentId}</Text>
-                    </View>
-                    <View style={s.modalIdItem}>
-                      <Text style={s.modalIdLabel}>Patient ID:</Text>
-                      <Text style={s.modalIdValue}>{selectedInvoice.patientId?._id || selectedInvoice.patientId}</Text>
-                    </View>
-                  </View>
-
-                  <View style={s.modalDivider} />
-
-                  {/* Breakdown */}
-                  <Text style={s.breakdownTitle}>Service Breakdown</Text>
-                  
-                  <View style={s.feeRow}>
-                    <Text style={s.feeLabel}>Consultation Fee</Text>
-                    <Text style={s.feeValue}>Rs. {selectedInvoice.consultationFee || 1500}</Text>
-                  </View>
-
-                  {selectedInvoice.serviceCharge > 0 && (
-                    <View style={s.feeRow}>
-                      <Text style={s.feeLabel}>Service Charge</Text>
-                      <Text style={s.feeValue}>Rs. {selectedInvoice.serviceCharge}</Text>
-                    </View>
-                  )}
-
-                  {selectedInvoice.treatmentCharge > 0 && (
-                    <View style={s.feeRow}>
-                      <Text style={s.feeLabel}>Treatment Charge</Text>
-                      <Text style={s.feeValue}>Rs. {selectedInvoice.treatmentCharge}</Text>
-                    </View>
-                  )}
-
-                  {selectedInvoice.items && selectedInvoice.items.length > 0 && selectedInvoice.items.map((item, idx) => (
-                    <View key={idx} style={s.feeRow}>
-                      <Text style={s.feeLabel}>{item.description}</Text>
-                      <Text style={s.feeValue}>Rs. {item.amount}</Text>
-                    </View>
-                  ))}
-
-                  {selectedInvoice.medicineFee > 0 && (
-                    <View style={s.feeRow}>
-                      <Text style={s.feeLabel}>Medicine Charges</Text>
-                      <Text style={s.feeValue}>Rs. {selectedInvoice.medicineFee}</Text>
-                    </View>
-                  )}
-
-                  {selectedInvoice.otherCharges > 0 && (
-                    <View style={s.feeRow}>
-                      <Text style={s.feeLabel}>Other Charges</Text>
-                      <Text style={s.feeValue}>Rs. {selectedInvoice.otherCharges}</Text>
-                    </View>
-                  )}
-
-                  <View style={s.modalTotalRow}>
-                    <Text style={s.modalTotalLabel}>Total Amount</Text>
-                    <Text style={s.modalTotalValue}>Rs. {selectedInvoice.amount}</Text>
-                  </View>
-
-                  {/* Payment Status */}
-                  <View style={[s.modalStatusBadge, selectedInvoice.status === 'Paid' ? s.badgePaid : s.badgePending]}>
-                    <Ionicons 
-                      name={selectedInvoice.status === 'Paid' ? "checkmark-circle" : "time-outline"} 
-                      size={16} 
-                      color={selectedInvoice.status === 'Paid' ? "#2E7D32" : "#E65100"} 
-                    />
-                    <Text style={[s.modalStatusText, selectedInvoice.status === 'Paid' ? s.textPaid : s.textPending]}>
-                      Status: {selectedInvoice.status}
-                    </Text>
-                  </View>
-
-                  {selectedInvoice.status === 'Pending' && (
-                    <TouchableOpacity 
-                      style={[s.modalPayBtn, paying && { opacity: 0.7 }]} 
-                      onPress={() => {
-                        setModalVisible(false);
-                        handlePay(selectedInvoice);
-                      }}
-                      disabled={paying}
-                    >
-                      {paying ? (
-                        <ActivityIndicator color="#fff" />
-                      ) : (
-                        <Text style={s.modalPayBtnText}>Proceed to Payment</Text>
-                      )}
-                    </TouchableOpacity>
-                  )}
+                <View style={styles.receiptHead}>
+                  <Text style={styles.receiptBrand}>MediCare Clinic</Text>
+                  <Text style={styles.receiptNo}>Invoice #{selected._id.slice(-6).toUpperCase()}</Text>
+                  <Text style={styles.receiptTotal}>{money(selected.amount)}</Text>
+                  <StatusBadge status={selected.status} style={{ alignSelf: 'center', marginTop: 8 }} />
                 </View>
+
+                <View style={styles.receiptMeta}>
+                  <View style={styles.metaRow}><Text style={styles.metaLabel}>Doctor</Text><Text style={styles.metaValue}>{selected.doctorId?.name ? doctorName(selected.doctorId.name) : '—'}</Text></View>
+                  <View style={styles.metaRow}><Text style={styles.metaLabel}>Visit date</Text><Text style={styles.metaValue}>{selected.appointmentId?.date ? fmtDate(selected.appointmentId.date) : fmtDate(selected.createdAt)}</Text></View>
+                  {selected.paidAt ? <View style={styles.metaRow}><Text style={styles.metaLabel}>Paid on</Text><Text style={styles.metaValue}>{fmtDate(selected.paidAt)}{selected.paymentMethod ? ` · ${selected.paymentMethod}` : ''}</Text></View> : null}
+                </View>
+
+                <Text style={styles.breakTitle}>Breakdown</Text>
+                {lines(selected).map(([label, value], i) => (
+                  <View key={`${label}-${i}`} style={styles.lineRow}>
+                    <Text style={styles.lineLabel}>{label}</Text>
+                    <Text style={styles.lineValue}>{money(value)}</Text>
+                  </View>
+                ))}
+                <View style={styles.totalRow}>
+                  <Text style={styles.totalLabel}>Total</Text>
+                  <Text style={styles.totalValue}>{money(selected.amount)}</Text>
+                </View>
+
+                {(selected.status === 'Pending' || selected.status === 'Overdue') && (
+                  <Button title={`Pay ${money(selected.amount)}`} icon="card-outline" onPress={() => handlePay(selected)} loading={paying} style={{ marginTop: 18 }} />
+                )}
               </ScrollView>
             )}
-          </View>
-        </View>
+          </Pressable>
+        </Pressable>
       </Modal>
-    </SafeAreaView>
+    </View>
   );
 }
 
-const s = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: '#F5F7FA' },
-  header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingVertical: 12, backgroundColor: '#fff', borderBottomWidth: 1, borderBottomColor: '#f0f0f0' },
-  backBtn: { width: 36, height: 36, borderRadius: 12, backgroundColor: '#F0FAF7', alignItems: 'center', justifyContent: 'center' },
-  headerTitle: { fontSize: 17, fontWeight: '800', color: '#0A2E2A' },
-  scroll: { padding: 16 },
+const styles = StyleSheet.create({
+  screen: { flex: 1, backgroundColor: colors.background },
+  back: { width: 40, height: 40, borderRadius: 12, backgroundColor: 'rgba(255,255,255,0.16)', alignItems: 'center', justifyContent: 'center', marginBottom: 10 },
+  title: { color: '#fff', fontSize: 26, fontWeight: '800', marginTop: 6, letterSpacing: -0.3 },
+  summary: { flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.14)', borderRadius: radius.lg, padding: 16, marginTop: 16 },
+  sumLabel: { color: 'rgba(255,255,255,0.8)', fontSize: 12, fontWeight: '600' },
+  sumValue: { color: '#fff', fontSize: 24, fontWeight: '800', marginTop: 4 },
+  sumHint: { color: 'rgba(255,255,255,0.75)', fontSize: 12, marginTop: 2 },
+  sumDivider: { width: 1, alignSelf: 'stretch', backgroundColor: 'rgba(255,255,255,0.25)' },
 
-  invoiceCard: { backgroundColor: '#fff', borderRadius: 18, padding: 18, marginBottom: 16, elevation: 3, shadowColor: '#000', shadowOpacity: 0.06, shadowOffset: { width: 0, height: 3 }, shadowRadius: 10, borderLeftWidth: 4, borderLeftColor: '#0DB591' },
-  invoiceHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 14 },
-  invoiceTitleBlock: { flex: 1 },
-  invoiceTitle: { fontSize: 16, fontWeight: '800', color: '#0A2E2A' },
-  invoiceDate: { fontSize: 12, color: '#888', marginTop: 3 },
-  statusBadge: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 12 },
-  badgePending: { backgroundColor: '#FFF3E0' },
-  badgePaid: { backgroundColor: '#E8F5E9' },
-  statusText: { fontSize: 12, fontWeight: '700' },
-  textPending: { color: '#E65100' },
-  textPaid: { color: '#2E7D32' },
+  list: { padding: 20, paddingBottom: 120 },
+  card: { marginBottom: 12, padding: 14 },
+  cardTop: { flexDirection: 'row', alignItems: 'center' },
+  iconBox: { width: 44, height: 44, borderRadius: 14, alignItems: 'center', justifyContent: 'center' },
+  cardTitle: { fontSize: 15, fontWeight: '800', color: colors.ink },
+  cardSub: { fontSize: 12, color: colors.body, marginTop: 2 },
+  cardBottom: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 14, paddingTop: 12, borderTopWidth: 1, borderTopColor: colors.border },
+  amount: { fontSize: 18, fontWeight: '800', color: colors.ink },
+  paidOn: { fontSize: 12, color: colors.success, fontWeight: '700' },
 
-  infoRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 8 },
-  infoLabel: { fontSize: 12, color: '#999', width: 90 },
-  infoValue: { fontSize: 13, fontWeight: '600', color: '#333', flex: 1 },
-
-  divider: { height: 1, backgroundColor: '#f0f0f0', marginVertical: 14 },
-  breakdownTitle: { fontSize: 12, fontWeight: '700', color: '#999', textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 10 },
-  feeRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 8 },
-  feeLabel: { fontSize: 13, color: '#555' },
-  feeValue: { fontSize: 13, color: '#333', fontWeight: '600' },
-  totalRow: { flexDirection: 'row', justifyContent: 'space-between', borderTopWidth: 1, borderTopColor: '#f0f0f0', marginTop: 10, paddingTop: 12 },
-  totalLabel: { fontSize: 15, fontWeight: '800', color: '#0A2E2A' },
-  totalValue: { fontSize: 18, fontWeight: '900', color: '#0DB591' },
-
-  payBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', backgroundColor: '#0DB591', borderRadius: 14, paddingVertical: 14, marginTop: 16, gap: 8, elevation: 3, shadowColor: '#0DB591', shadowOpacity: 0.3, shadowOffset: { width: 0, height: 4 }, shadowRadius: 10 },
-  payBtnText: { color: '#fff', fontSize: 15, fontWeight: '800' },
-  paidBanner: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', backgroundColor: '#E8F5E9', borderRadius: 12, paddingVertical: 12, marginTop: 14, gap: 8 },
-  paidBannerText: { color: '#2E7D32', fontSize: 14, fontWeight: '700' },
-
-  empty: { alignItems: 'center', paddingTop: 80, paddingHorizontal: 32 },
-  emptyTitle: { fontSize: 18, fontWeight: '700', color: '#333', marginTop: 16, marginBottom: 8 },
-  emptyText: { fontSize: 13, color: '#999', textAlign: 'center', lineHeight: 20 },
-
-  summaryRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 10 },
-  docMiniInfo: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  docMiniName: { fontSize: 13, color: '#555', fontWeight: '500' },
-  summaryAmount: { fontSize: 15, fontWeight: '800', color: '#0DB591' },
-  viewDetailsAction: { flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end', marginTop: 12, gap: 4, borderTopWidth: 1, borderTopColor: '#f0f0f0', paddingTop: 8 },
-  viewDetailsText: { fontSize: 11, color: '#999', fontWeight: '600' },
-
-  // Modal Styles
-  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' },
-  modalContent: { backgroundColor: '#fff', borderTopLeftRadius: 24, borderTopRightRadius: 24, padding: 24, maxHeight: '80%' },
-  modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 },
-  modalTitle: { fontSize: 20, fontWeight: '800', color: '#0A2E2A' },
-  modalBody: { paddingBottom: 20 },
-  modalInfoSection: { marginBottom: 16 },
-  modalDocName: { fontSize: 18, fontWeight: '800', color: '#0A2E2A' },
-  modalDocSpec: { fontSize: 14, color: '#888', marginTop: 2 },
-  modalDate: { fontSize: 13, color: '#999', marginTop: 6 },
-  modalIdBlock: { backgroundColor: '#F9FAFB', borderRadius: 12, padding: 12, marginTop: 12, gap: 6 },
-  modalIdItem: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  modalIdLabel: { fontSize: 11, fontWeight: '600', color: '#999', textTransform: 'uppercase' },
-  modalIdValue: { fontSize: 11, fontWeight: '700', color: '#666', fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace' },
-  modalDivider: { height: 1, backgroundColor: '#f0f0f0', marginVertical: 20 },
-  modalTotalRow: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 24, paddingTop: 16, borderTopWidth: 2, borderTopColor: '#f0f0f0', borderStyle: 'dashed' },
-  modalTotalLabel: { fontSize: 16, fontWeight: '800', color: '#0A2E2A' },
-  modalTotalValue: { fontSize: 22, fontWeight: '900', color: '#0DB591' },
-  modalStatusBadge: { flexDirection: 'row', alignItems: 'center', gap: 8, padding: 12, borderRadius: 12, marginTop: 20, justifyContent: 'center' },
-  modalStatusText: { fontSize: 14, fontWeight: '700' },
-  modalPayBtn: { backgroundColor: '#0DB591', borderRadius: 16, paddingVertical: 16, alignItems: 'center', marginTop: 24 },
-  modalPayBtnText: { color: '#fff', fontSize: 16, fontWeight: '800' },
+  overlay: { flex: 1, backgroundColor: 'rgba(6,30,34,0.55)', justifyContent: 'flex-end' },
+  sheet: { backgroundColor: '#fff', borderTopLeftRadius: 28, borderTopRightRadius: 28, padding: 20, paddingBottom: 34, maxHeight: '88%' },
+  handle: { width: 44, height: 5, borderRadius: 3, backgroundColor: colors.border, alignSelf: 'center', marginBottom: 14 },
+  receiptHead: { alignItems: 'center', paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: colors.border, borderStyle: 'dashed', marginBottom: 14 },
+  receiptBrand: { fontSize: 13, fontWeight: '800', color: colors.primary, letterSpacing: 0.5 },
+  receiptNo: { fontSize: 12, color: colors.muted, marginTop: 2 },
+  receiptTotal: { fontSize: 32, fontWeight: '800', color: colors.ink, marginTop: 10, letterSpacing: -0.5 },
+  receiptMeta: { backgroundColor: colors.surfaceAlt, borderRadius: radius.md, padding: 12, gap: 8 },
+  metaRow: { flexDirection: 'row', justifyContent: 'space-between' },
+  metaLabel: { fontSize: 13, color: colors.body },
+  metaValue: { fontSize: 13, color: colors.ink, fontWeight: '700' },
+  breakTitle: { fontSize: 15, fontWeight: '800', color: colors.ink, marginTop: 18, marginBottom: 6 },
+  lineRow: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 9, borderBottomWidth: 1, borderBottomColor: colors.border },
+  lineLabel: { fontSize: 14, color: colors.body, flex: 1, marginRight: 10 },
+  lineValue: { fontSize: 14, color: colors.ink, fontWeight: '700' },
+  totalRow: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 12 },
+  totalLabel: { fontSize: 16, fontWeight: '800', color: colors.ink },
+  totalValue: { fontSize: 18, fontWeight: '800', color: colors.primary },
 });
