@@ -17,6 +17,11 @@ exports.protect = async (req, res, next) => {
       return res.status(401).json({ message: 'Not authorized, user not found' });
     }
 
+    // Accounts disabled by an admin lose access immediately, even with a valid token
+    if (user.isActive === false) {
+      return res.status(403).json({ message: 'This account has been deactivated. Please contact the clinic.' });
+    }
+
     req.user = user;
     next();
   } catch (error) {

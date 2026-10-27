@@ -18,6 +18,7 @@ exports.createDoctor = async (req, res) => {
       qualifications,
       schedule,
       userId,
+      consultationFee,
     } = req.body;
 
     // Validate required fields
@@ -68,7 +69,13 @@ exports.createDoctor = async (req, res) => {
       }
     }
 
+    const fee = consultationFee === undefined || consultationFee === '' ? 1500 : Number(consultationFee);
+    if (!Number.isFinite(fee) || fee < 0) {
+      return res.status(400).json({ message: 'Consultation fee must be a positive number' });
+    }
+
     const doctor = await Doctor.create({
+      consultationFee: fee,
       userId: userId || null,
       name: name.trim(),
       email: email.toLowerCase().trim(),
@@ -206,12 +213,19 @@ exports.updateDoctor = async (req, res) => {
     }
 
     // Only allow known fields to be updated (prevents overwriting _id, userId, etc.)
-    const allowed = ['name', 'email', 'phone', 'specialization', 'experience', 'qualifications', 'schedule', 'isActive'];
+    const allowed = ['name', 'email', 'phone', 'specialization', 'experience', 'qualifications', 'schedule', 'isActive', 'consultationFee'];
     const updateData = {};
     allowed.forEach((key) => {
       if (req.body[key] !== undefined) updateData[key] = req.body[key];
     });
     if (typeof updateData.isActive === 'string') updateData.isActive = updateData.isActive === 'true';
+    if (updateData.consultationFee !== undefined) {
+      const fee = Number(updateData.consultationFee);
+      if (!Number.isFinite(fee) || fee < 0) {
+        return res.status(400).json({ message: 'Consultation fee must be a positive number' });
+      }
+      updateData.consultationFee = fee;
+    }
     if (typeof updateData.email === 'string') updateData.email = updateData.email.toLowerCase().trim();
 
     // Parse schedule if it's sent as stringified JSON

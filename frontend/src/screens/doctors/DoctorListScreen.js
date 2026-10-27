@@ -85,6 +85,12 @@ export default function DoctorListScreen({ navigation }) {
                 <Text style={styles.metaStrong}>{item.averageRating || '5.0'}</Text>
                 <Text style={styles.metaText}>({item.totalReviews || 0})</Text>
               </View>
+              {item.consultationFee != null ? (
+                <View style={styles.metaPill}>
+                  <Ionicons name="cash-outline" size={12} color={colors.primary} />
+                  <Text style={styles.metaText}>Rs. {Number(item.consultationFee).toLocaleString()}</Text>
+                </View>
+              ) : null}
               {item.experience ? (
                 <View style={styles.metaPill}>
                   <Ionicons name="briefcase-outline" size={12} color={colors.primary} />

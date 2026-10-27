@@ -99,9 +99,13 @@ exports.login = async (req, res) => {
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
-    
+
     if (!isMatch) {
       return res.status(401).json({ message: 'Incorrect password. Please try again.' });
+    }
+
+    if (user.isActive === false) {
+      return res.status(403).json({ message: 'This account has been deactivated. Please contact the clinic.' });
     }
 
     const { accessToken, refreshToken } = signTokens(user);
@@ -143,7 +147,7 @@ exports.refreshAccessToken = async (req, res) => {
     const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
     const user = await User.findById(decoded.id);
 
-    if (!user) {
+    if (!user || user.isActive === false) {
       return res.status(401).json({ message: 'User not found' });
     }
 

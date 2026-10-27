@@ -1,6 +1,7 @@
 const Patient = require('../models/Patient');
 const Appointment = require('../models/Appointment');
 const Billing = require('../models/Billing');
+const User = require('../models/User');
 const { saveFile } = require('../utils/fileStorage');
 
 const parseContact = (value) => {
@@ -35,7 +36,7 @@ exports.createPatientProfile = async (req, res) => {
 
 exports.getPatientProfile = async (req, res) => {
   try {
-    const patient = await Patient.findOne({ userId: req.user._id }).populate('userId', 'name email');
+    const patient = await Patient.findOne({ userId: req.user._id, isActive: true }).populate('userId', 'name email');
     if (!patient) {
       return res.status(404).json({ message: 'Profile not found' });
     }
@@ -102,9 +103,10 @@ exports.deletePatient = async (req, res) => {
       return res.status(404).json({ message: 'Patient not found' });
     }
 
-    // Soft delete the patient
+    // Soft delete the patient AND disable their login, so they can't keep booking
     patient.isActive = false;
     await patient.save();
+    await User.findByIdAndUpdate(patient.userId, { isActive: false });
 
     // CASCADING DELETES (Phase 1.5 Fix)
     // 1. Cancel all Pending/Confirmed appointments

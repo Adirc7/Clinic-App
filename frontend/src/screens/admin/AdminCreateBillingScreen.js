@@ -170,7 +170,12 @@ export default function AdminCreateBillingScreen({ navigation, route }) {
                 <TouchableOpacity
                   key={apt._id}
                   style={[s.pickerItem, selectedApt?._id === apt._id && s.pickerItemSelected]}
-                  onPress={() => { setSelectedApt(apt); setShowPicker(false); }}
+                  onPress={() => {
+                    setSelectedApt(apt);
+                    // Start from this doctor's own consultation fee
+                    if (apt.doctorId?.consultationFee != null) setConsultationFee(String(apt.doctorId.consultationFee));
+                    setShowPicker(false);
+                  }}
                 >
                   <Text style={s.pickerItemName}>{apt.patientName || apt.patientId?.name}</Text>
                   <Text style={s.pickerItemSub}>

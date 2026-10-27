@@ -324,7 +324,7 @@ export default function DoctorDetailScreen({ route, navigation, currentUser }) {
         <View style={styles.statsRow}>
           {[
             { icon: 'star', color: '#F59E0B', value: doctor.averageRating || '5.0', label: 'Rating' },
-            { icon: 'chatbubble-ellipses', color: colors.info, value: String(doctor.totalReviews || 0), label: 'Reviews' },
+            { icon: 'cash', color: colors.success, value: `Rs. ${Number(doctor.consultationFee ?? 1500).toLocaleString()}`, label: 'Fee' },
             { icon: 'briefcase', color: colors.primary, value: (doctor.experience || '—').replace(/\s*years?/i, ' yrs'), label: 'Experience' },
           ].map((st) => (
             <View key={st.label} style={styles.statItem}>
@@ -492,7 +492,9 @@ export default function DoctorDetailScreen({ route, navigation, currentUser }) {
       {/* Bottom Bar */}
       <View style={[styles.bottomBar, { paddingBottom: tabBarHeight + 14 }]}>
         <View style={{ flex: 1 }}>
-          <Text style={styles.bottomLabel}>{selectedDate ? `${selectedDate.day}, ${selectedDate.date}` : 'No date selected'}</Text>
+          <Text style={styles.bottomLabel}>
+            {selectedDate ? `${selectedDate.day}, ${selectedDate.date}` : 'No date selected'} · Fee Rs. {Number(doctor.consultationFee ?? 1500).toLocaleString()}
+          </Text>
           <Text style={styles.bottomValue}>{selectedTime || 'Pick a time slot'}</Text>
         </View>
         <Button

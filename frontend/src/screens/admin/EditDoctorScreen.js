@@ -49,6 +49,7 @@ export default function EditDoctorScreen({ route, navigation }) {
     specialization: doctor?.specialization || '',
     experience: doctor?.experience || '',
     qualifications: doctor?.qualifications || '',
+    consultationFee: doctor?.consultationFee != null ? String(doctor.consultationFee) : '1500',
     availabilityDays: doctor?.schedule?.days || [], // Array of day objects
     password: '', // Only for new doctors
   });
@@ -129,6 +130,12 @@ export default function EditDoctorScreen({ route, navigation }) {
       valid = false;
     }
 
+    const fee = Number(formData.consultationFee);
+    if (formData.consultationFee.trim() === '' || !Number.isFinite(fee) || fee < 0) {
+      newErrors.consultationFee = 'Enter a valid fee (0 or more)';
+      valid = false;
+    }
+
     if (formData.availabilityDays.length === 0) {
       newErrors.availability = 'At least one availability slot is required';
       valid = false;
@@ -170,6 +177,7 @@ export default function EditDoctorScreen({ route, navigation }) {
         data.append('specialization', formData.specialization.trim());
         data.append('experience', formData.experience.trim());
         data.append('qualifications', formData.qualifications.trim());
+        data.append('consultationFee', String(Number(formData.consultationFee)));
         data.append(
           'schedule',
           JSON.stringify({
@@ -204,6 +212,7 @@ export default function EditDoctorScreen({ route, navigation }) {
         data.append('specialization', formData.specialization.trim());
         data.append('experience', formData.experience.trim());
         data.append('qualifications', formData.qualifications.trim());
+        data.append('consultationFee', String(Number(formData.consultationFee)));
         data.append(
           'schedule',
           JSON.stringify({
@@ -425,6 +434,24 @@ export default function EditDoctorScreen({ route, navigation }) {
             />
             {errors.qualifications && (
               <Text style={styles.errorText}>{errors.qualifications}</Text>
+            )}
+          </View>
+
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>Consultation Fee (Rs.) *</Text>
+            <TextInput
+              style={[styles.input, errors.consultationFee && styles.inputError]}
+              placeholder="e.g., 2500"
+              keyboardType="numeric"
+              value={formData.consultationFee}
+              onChangeText={(text) => {
+                setFormData({ ...formData, consultationFee: text.replace(/[^0-9.]/g, '') });
+                setErrors({ ...errors, consultationFee: null });
+              }}
+            />
+            <Text style={styles.helperText}>Used for the automatic bill when this doctor completes a visit</Text>
+            {errors.consultationFee && (
+              <Text style={styles.errorText}>{errors.consultationFee}</Text>
             )}
           </View>
 

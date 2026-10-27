@@ -485,21 +485,21 @@ export default function AllAppointmentsScreen({ currentUser, navigation }) {
                   style={[styles.prescriptionBtn, { width: '100%', backgroundColor: '#E53935', marginTop: 10 }]}
                   onPress={() => {
                     Alert.alert(
-                      "Delete Appointment",
-                      "Are you sure you want to permanently delete this appointment?",
+                      "Cancel Appointment",
+                      "Cancel this appointment? The patient will see it as cancelled and the record is kept.",
                       [
                         { text: "Cancel", style: "cancel" },
                         { 
-                          text: "Delete", 
+                          text: "Yes, cancel", 
                           style: "destructive",
                           onPress: async () => {
                             try {
                               await axiosInstance.delete(`/appointments/${selectedAppointment._id}`);
                               setIsPatientModalVisible(false);
                               fetchAppointments();
-                              Alert.alert('Deleted', 'Appointment deleted successfully.');
+                              Alert.alert('Cancelled', 'The appointment has been cancelled.');
                             } catch (_error) {
-                              Alert.alert('Error', 'Failed to delete appointment.');
+                              Alert.alert('Error', 'Failed to cancel appointment.');
                             }
                           }
                         }
@@ -508,7 +508,7 @@ export default function AllAppointmentsScreen({ currentUser, navigation }) {
                   }}
                 >
                   <Ionicons name="trash-outline" size={16} color="#FFF" />
-                  <Text style={styles.prescriptionBtnText}>Delete Appointment</Text>
+                  <Text style={styles.prescriptionBtnText}>Cancel Appointment</Text>
                 </TouchableOpacity>
               </ScrollView>
             )}

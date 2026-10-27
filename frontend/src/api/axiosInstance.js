@@ -86,6 +86,14 @@ axiosInstance.interceptors.response.use(
     const url = originalRequest.url || '';
     const isAuthCall = /\/auth\/(login|register|refresh)/.test(url);
 
+    // Account was deactivated by an admin → sign out everywhere
+    if (error.response?.status === 403 && /deactivated/i.test(error.response?.data?.message || '') && !isAuthCall) {
+      await AsyncStorage.multiRemove(['accessToken', 'refreshToken', 'cachedUser']);
+      delete axiosInstance.defaults.headers.common.Authorization;
+      sessionExpiredListeners.forEach((fn) => fn());
+      return Promise.reject(error);
+    }
+
     // Don't try to refresh for login/register — show the server's message instead
     if (error.response?.status === 401 && !originalRequest._retry && !isAuthCall) {
       originalRequest._retry = true;

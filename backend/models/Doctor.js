@@ -49,6 +49,12 @@ const doctorSchema = new mongoose.Schema(
         default: [],
       },
     },
+    // Consultation fee in LKR, used for the automatic bill when a visit is completed
+    consultationFee: {
+      type: Number,
+      default: 1500,
+      min: [0, 'Fee cannot be negative'],
+    },
     profilePhoto: {
       type: String, // Path to uploaded image
       default: null,
