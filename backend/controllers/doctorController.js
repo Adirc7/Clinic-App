@@ -108,7 +108,7 @@ exports.getAllDoctorsAdmin = async (req, res) => {
     const doctors = await Doctor.find().lean();
     res.json(doctors);
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message });
+    res.status(error.statusCode || 500).json({ message: error.statusCode ? error.message : 'Server error', error: error.message });
   }
 };
 
@@ -137,7 +137,7 @@ exports.getAllDoctors = async (req, res) => {
 
     res.json(enrichedDoctors);
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message });
+    res.status(error.statusCode || 500).json({ message: error.statusCode ? error.message : 'Server error', error: error.message });
   }
 };
 
@@ -152,7 +152,7 @@ exports.getMyDoctorProfile = async (req, res) => {
     }
     res.json(doctor);
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message });
+    res.status(error.statusCode || 500).json({ message: error.statusCode ? error.message : 'Server error', error: error.message });
   }
 };
 
@@ -176,7 +176,7 @@ exports.updateMyStatus = async (req, res) => {
 
     res.json({ message: 'Status updated successfully', isActive: doctor.isActive });
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message });
+    res.status(error.statusCode || 500).json({ message: error.statusCode ? error.message : 'Server error', error: error.message });
   }
 };
 
@@ -197,7 +197,7 @@ exports.getDoctorById = async (req, res) => {
 
     res.json({ ...doctor, averageRating: avgRating, totalReviews: reviews.length });
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message });
+    res.status(error.statusCode || 500).json({ message: error.statusCode ? error.message : 'Server error', error: error.message });
   }
 };
 
@@ -253,7 +253,7 @@ exports.updateDoctor = async (req, res) => {
 
     res.json(doctor);
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message });
+    res.status(error.statusCode || 500).json({ message: error.statusCode ? error.message : 'Server error', error: error.message });
   }
 };
 
@@ -273,7 +273,7 @@ exports.deleteDoctor = async (req, res) => {
 
     res.json({ message: 'Doctor removed successfully' });
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message });
+    res.status(error.statusCode || 500).json({ message: error.statusCode ? error.message : 'Server error', error: error.message });
   }
 };
 
@@ -306,6 +306,6 @@ exports.getAdminStats = async (req, res) => {
       totalAppointments,
     });
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message });
+    res.status(error.statusCode || 500).json({ message: error.statusCode ? error.message : 'Server error', error: error.message });
   }
 };

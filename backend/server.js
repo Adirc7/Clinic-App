@@ -12,17 +12,40 @@ const { notFound, errorHandler } = require('./middleware/errorMiddleware');
 const User = require('./models/User');
 const { UPLOAD_DIR, isCloudinaryEnabled } = require('./utils/fileStorage');
 
+// Running as a serverless function on Vercel (no long-lived process, no writable disk)
+const IS_SERVERLESS = !!process.env.VERCEL;
+
 // ── Required configuration ────────────────────────────────────────────────────
 const REQUIRED_ENV = ['MONGO_URI', 'JWT_SECRET', 'JWT_REFRESH_SECRET'];
 const missing = REQUIRED_ENV.filter((key) => !process.env[key]);
 if (missing.length) {
   console.error(`Missing required environment variables: ${missing.join(', ')}`);
   console.error('Copy backend/.env.example to backend/.env (local) or set them in your host dashboard.');
-  process.exit(1);
+  // A normal server stops; on Vercel the API answers with a clear error instead (see below)
+  if (!IS_SERVERLESS) process.exit(1);
 }
 
+// ── Database connection (shared by every request; reused between serverless calls) ──
+let connectPromise = null;
+const connectDB = () => {
+  if (mongoose.connection.readyState === 1) return Promise.resolve();
+  if (!connectPromise) {
+    connectPromise = mongoose
+      .connect(process.env.MONGO_URI, { serverSelectionTimeoutMS: 15000 })
+      .then(async () => {
+        console.log(`MongoDB connected (${mongoose.connection.name})`);
+        await ensureDefaultAdmin().catch((err) => console.log('Admin bootstrap error:', err.message));
+      })
+      .catch((err) => {
+        connectPromise = null; // allow a retry on the next request
+        throw err;
+      });
+  }
+  return connectPromise;
+};
+
 const app = express();
-app.set('trust proxy', 1); // correct client IPs behind Render/Railway proxies
+app.set('trust proxy', 1); // correct client IPs behind Render/Railway/Vercel proxies
 
 // ── Middleware ────────────────────────────────────────────────────────────────
 // CORS_ORIGIN can be a comma-separated list; mobile apps don't send an Origin so they're always allowed
@@ -65,14 +88,29 @@ app.get('/', (req, res) => {
   res.json({ name: 'MediCare Clinic API', status: 'ok', docs: '/api/health' });
 });
 
-app.get(['/api/health', '/api/test'], (req, res) => {
+app.get(['/api/health', '/api/test'], async (req, res) => {
+  if (!missing.length) await connectDB().catch(() => {});
   const states = ['disconnected', 'connected', 'connecting', 'disconnecting'];
   res.json({
     message: 'Backend API is running successfully',
     database: states[mongoose.connection.readyState] || 'unknown',
-    fileStorage: isCloudinaryEnabled() ? 'cloudinary' : 'local',
+    fileStorage: isCloudinaryEnabled() ? 'cloudinary' : IS_SERVERLESS ? 'not configured (add Cloudinary keys)' : 'local',
     time: new Date().toISOString(),
   });
+});
+
+// ── Make sure the database is connected before any API route runs ─────────────
+app.use('/api', async (req, res, next) => {
+  if (missing.length) {
+    return res.status(500).json({ message: `Server is missing configuration: ${missing.join(', ')}` });
+  }
+  try {
+    await connectDB();
+    next();
+  } catch (err) {
+    console.error('MongoDB connection error:', err.message);
+    res.status(503).json({ message: 'Database unavailable. Please try again shortly.' });
+  }
 });
 
 // ── API routes ────────────────────────────────────────────────────────────────
@@ -95,9 +133,7 @@ const PORT = process.env.PORT || 5000;
 
 const start = async () => {
   try {
-    await mongoose.connect(process.env.MONGO_URI, { serverSelectionTimeoutMS: 15000 });
-    console.log(`MongoDB connected (${mongoose.connection.name})`);
-    await ensureDefaultAdmin().catch((err) => console.log('Admin bootstrap error:', err.message));
+    await connectDB();
   } catch (err) {
     console.error('MongoDB connection error:', err.message);
     console.error('Check MONGO_URI and that Atlas Network Access allows this server (0.0.0.0/0 for cloud hosts).');

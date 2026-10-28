@@ -5,6 +5,9 @@ const path = require('path');
 // (to Cloudinary when configured, otherwise to backend/uploads).
 const storage = multer.memoryStorage();
 
+// Vercel rejects request bodies over 4.5 MB, so stay under it there
+const MAX_MB = process.env.VERCEL ? 4 : null;
+
 const imageFilter = (req, file, cb) => {
   if (file.mimetype && file.mimetype.startsWith('image/')) {
     cb(null, true);
@@ -25,14 +28,14 @@ const documentFilter = (req, file, cb) => {
 const uploadMiddleware = multer({
   storage,
   fileFilter: imageFilter,
-  limits: { fileSize: 5 * 1024 * 1024 },
+  limits: { fileSize: (MAX_MB || 5) * 1024 * 1024 },
 });
 
 // Medical records — images or PDFs, 10MB
 uploadMiddleware.documents = multer({
   storage,
   fileFilter: documentFilter,
-  limits: { fileSize: 10 * 1024 * 1024 },
+  limits: { fileSize: (MAX_MB || 10) * 1024 * 1024 },
 });
 
 module.exports = uploadMiddleware;

@@ -17,7 +17,7 @@ exports.getSettings = async (req, res) => {
     
     res.json(settings);
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message });
+    res.status(error.statusCode || 500).json({ message: error.statusCode ? error.message : 'Server error', error: error.message });
   }
 };
 
@@ -48,6 +48,6 @@ exports.updateSettings = async (req, res) => {
     
     res.json(settings);
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message });
+    res.status(error.statusCode || 500).json({ message: error.statusCode ? error.message : 'Server error', error: error.message });
   }
 };

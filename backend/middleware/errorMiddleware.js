@@ -52,6 +52,11 @@ exports.errorHandler = (err, req, res, next) => {
     return res.status(401).json({ success: false, message: 'Token has expired.' });
   }
 
+  // Upload too big (multer)
+  if (err.code === 'LIMIT_FILE_SIZE') {
+    return res.status(413).json({ success: false, message: 'File is too large. Please choose a smaller file (max 4 MB).' });
+  }
+
   // Generic fallback
   res.status(statusCode).json({
     success: false,

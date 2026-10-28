@@ -46,7 +46,7 @@ exports.createRecord = async (req, res) => {
 
     res.status(201).json(newRecord);
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message });
+    res.status(error.statusCode || 500).json({ message: error.statusCode ? error.message : 'Server error', error: error.message });
   }
 };
 
@@ -56,7 +56,7 @@ exports.getMyRecords = async (req, res) => {
       .sort({ recordDate: -1 });
     res.json(records);
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message });
+    res.status(error.statusCode || 500).json({ message: error.statusCode ? error.message : 'Server error', error: error.message });
   }
 };
 
@@ -66,7 +66,7 @@ exports.getRecordsByPatient = async (req, res) => {
       .sort({ recordDate: -1 });
     res.json(records);
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message });
+    res.status(error.statusCode || 500).json({ message: error.statusCode ? error.message : 'Server error', error: error.message });
   }
 };
 
@@ -77,7 +77,7 @@ exports.getAllRecords = async (req, res) => {
       .sort({ createdAt: -1 });
     res.json(records);
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message });
+    res.status(error.statusCode || 500).json({ message: error.statusCode ? error.message : 'Server error', error: error.message });
   }
 };
 
@@ -96,7 +96,7 @@ exports.getRecordById = async (req, res) => {
 
     res.json(record);
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message });
+    res.status(error.statusCode || 500).json({ message: error.statusCode ? error.message : 'Server error', error: error.message });
   }
 };
 
@@ -121,7 +121,7 @@ exports.deleteRecord = async (req, res) => {
 
     res.json({ message: 'Record deleted successfully' });
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message });
+    res.status(error.statusCode || 500).json({ message: error.statusCode ? error.message : 'Server error', error: error.message });
   }
 };
 
@@ -146,6 +146,6 @@ exports.updateRecord = async (req, res) => {
     await record.save();
     res.json(record);
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message });
+    res.status(error.statusCode || 500).json({ message: error.statusCode ? error.message : 'Server error', error: error.message });
   }
 };

@@ -6,7 +6,7 @@ exports.getHolidays = async (req, res) => {
     const holidays = await Holiday.find({ isActive: true }).sort({ date: 1 });
     res.json(holidays);
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message });
+    res.status(error.statusCode || 500).json({ message: error.statusCode ? error.message : 'Server error', error: error.message });
   }
 };
 
@@ -26,7 +26,7 @@ exports.addHoliday = async (req, res) => {
     const holiday = await Holiday.create({ date, name, type });
     res.status(201).json(holiday);
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message });
+    res.status(error.statusCode || 500).json({ message: error.statusCode ? error.message : 'Server error', error: error.message });
   }
 };
 
@@ -40,6 +40,6 @@ exports.deleteHoliday = async (req, res) => {
     await holiday.deleteOne();
     res.json({ message: 'Holiday removed' });
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message });
+    res.status(error.statusCode || 500).json({ message: error.statusCode ? error.message : 'Server error', error: error.message });
   }
 };

@@ -128,7 +128,7 @@ exports.getAppointments = async (req, res) => {
 
     res.json(await attachPatientProfiles(appointments));
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message });
+    res.status(error.statusCode || 500).json({ message: error.statusCode ? error.message : 'Server error', error: error.message });
   }
 };
 
@@ -150,7 +150,7 @@ exports.getMyAppointmentsAsDoctor = async (req, res) => {
 
     res.json(await attachPatientProfiles(appointments));
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message });
+    res.status(error.statusCode || 500).json({ message: error.statusCode ? error.message : 'Server error', error: error.message });
   }
 };
 
@@ -166,7 +166,7 @@ exports.getMyAppointmentsAsPatient = async (req, res) => {
 
     res.json(appointments);
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message });
+    res.status(error.statusCode || 500).json({ message: error.statusCode ? error.message : 'Server error', error: error.message });
   }
 };
 
@@ -196,7 +196,7 @@ exports.getAppointmentById = async (req, res) => {
 
     res.json(appointment);
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message });
+    res.status(error.statusCode || 500).json({ message: error.statusCode ? error.message : 'Server error', error: error.message });
   }
 };
 
@@ -247,7 +247,7 @@ exports.createAppointment = async (req, res) => {
 
     res.status(201).json(populated);
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message });
+    res.status(error.statusCode || 500).json({ message: error.statusCode ? error.message : 'Server error', error: error.message });
   }
 };
 
@@ -314,7 +314,7 @@ exports.updateAppointmentStatus = async (req, res) => {
 
     res.json(populated);
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message });
+    res.status(error.statusCode || 500).json({ message: error.statusCode ? error.message : 'Server error', error: error.message });
   }
 };
 
@@ -396,7 +396,7 @@ exports.updateAppointment = async (req, res) => {
 
     res.json(appointment);
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message });
+    res.status(error.statusCode || 500).json({ message: error.statusCode ? error.message : 'Server error', error: error.message });
   }
 };
 
@@ -459,7 +459,7 @@ exports.deleteAppointment = async (req, res) => {
 
     res.json({ message: 'Appointment deleted successfully' });
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message });
+    res.status(error.statusCode || 500).json({ message: error.statusCode ? error.message : 'Server error', error: error.message });
   }
 };
 
@@ -519,7 +519,7 @@ exports.requestReschedule = async (req, res) => {
 
     res.json({ message: 'Reschedule request submitted to Admin', appointment });
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message });
+    res.status(error.statusCode || 500).json({ message: error.statusCode ? error.message : 'Server error', error: error.message });
   }
 };
 
@@ -536,7 +536,7 @@ exports.getRescheduleRequests = async (req, res) => {
 
     res.json(requests);
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message });
+    res.status(error.statusCode || 500).json({ message: error.statusCode ? error.message : 'Server error', error: error.message });
   }
 };
 
@@ -583,7 +583,7 @@ exports.approveReschedule = async (req, res) => {
 
     res.json({ message: 'Reschedule approved successfully', appointment });
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message });
+    res.status(error.statusCode || 500).json({ message: error.statusCode ? error.message : 'Server error', error: error.message });
   }
 };
 
@@ -607,6 +607,6 @@ exports.rejectReschedule = async (req, res) => {
 
     res.json({ message: 'Reschedule rejected successfully', appointment });
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message });
+    res.status(error.statusCode || 500).json({ message: error.statusCode ? error.message : 'Server error', error: error.message });
   }
 };

@@ -39,7 +39,7 @@ exports.createPrescription = async (req, res) => {
 
     res.status(201).json(prescription);
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message });
+    res.status(error.statusCode || 500).json({ message: error.statusCode ? error.message : 'Server error', error: error.message });
   }
 };
 
@@ -60,7 +60,7 @@ exports.getPrescriptionByAppointment = async (req, res) => {
 
     res.json(prescription);
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message });
+    res.status(error.statusCode || 500).json({ message: error.statusCode ? error.message : 'Server error', error: error.message });
   }
 };
 
@@ -72,7 +72,7 @@ exports.getMyPrescriptions = async (req, res) => {
       .sort({ createdAt: -1 });
     res.json(prescriptions);
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message });
+    res.status(error.statusCode || 500).json({ message: error.statusCode ? error.message : 'Server error', error: error.message });
   }
 };
 
@@ -85,7 +85,7 @@ exports.getAllPrescriptions = async (req, res) => {
       .sort({ createdAt: -1 });
     res.json(prescriptions);
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message });
+    res.status(error.statusCode || 500).json({ message: error.statusCode ? error.message : 'Server error', error: error.message });
   }
 };
 
@@ -102,7 +102,7 @@ exports.getPrescriptionById = async (req, res) => {
 
     res.json(prescription);
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message });
+    res.status(error.statusCode || 500).json({ message: error.statusCode ? error.message : 'Server error', error: error.message });
   }
 };
 
@@ -129,7 +129,7 @@ exports.updatePrescription = async (req, res) => {
     await prescription.save();
     res.json(prescription);
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message });
+    res.status(error.statusCode || 500).json({ message: error.statusCode ? error.message : 'Server error', error: error.message });
   }
 };
 
@@ -156,6 +156,6 @@ exports.deletePrescription = async (req, res) => {
     await prescription.deleteOne();
     res.json({ message: 'Prescription deleted successfully' });
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message });
+    res.status(error.statusCode || 500).json({ message: error.statusCode ? error.message : 'Server error', error: error.message });
   }
 };

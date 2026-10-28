@@ -30,7 +30,7 @@ exports.createPatientProfile = async (req, res) => {
 
     res.status(201).json(patient);
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message });
+    res.status(error.statusCode || 500).json({ message: error.statusCode ? error.message : 'Server error', error: error.message });
   }
 };
 
@@ -42,7 +42,7 @@ exports.getPatientProfile = async (req, res) => {
     }
     res.json(patient);
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message });
+    res.status(error.statusCode || 500).json({ message: error.statusCode ? error.message : 'Server error', error: error.message });
   }
 };
 
@@ -66,7 +66,7 @@ exports.updatePatientProfile = async (req, res) => {
     await patient.save();
     res.json(patient);
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message });
+    res.status(error.statusCode || 500).json({ message: error.statusCode ? error.message : 'Server error', error: error.message });
   }
 };
 
@@ -77,7 +77,7 @@ exports.getAllPatients = async (req, res) => {
       .sort({ createdAt: -1 });
     res.json(patients);
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message });
+    res.status(error.statusCode || 500).json({ message: error.statusCode ? error.message : 'Server error', error: error.message });
   }
 };
 
@@ -90,7 +90,7 @@ exports.getPatientById = async (req, res) => {
     }
     res.json(patient);
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message });
+    res.status(error.statusCode || 500).json({ message: error.statusCode ? error.message : 'Server error', error: error.message });
   }
 };
 
@@ -129,6 +129,6 @@ exports.deletePatient = async (req, res) => {
 
     res.json({ message: 'Patient soft-deleted and related records cancelled successfully.' });
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message });
+    res.status(error.statusCode || 500).json({ message: error.statusCode ? error.message : 'Server error', error: error.message });
   }
 };

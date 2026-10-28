@@ -88,7 +88,7 @@ exports.createInvoice = async (req, res) => {
 
     res.status(201).json(populated);
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message });
+    res.status(error.statusCode || 500).json({ message: error.statusCode ? error.message : 'Server error', error: error.message });
   }
 };
 
@@ -102,7 +102,7 @@ exports.getAllInvoices = async (req, res) => {
       .sort({ createdAt: -1 });
     res.json(invoices);
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message });
+    res.status(error.statusCode || 500).json({ message: error.statusCode ? error.message : 'Server error', error: error.message });
   }
 };
 
@@ -115,7 +115,7 @@ exports.getMyBilling = async (req, res) => {
       .sort({ createdAt: -1 });
     res.json(invoices);
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message });
+    res.status(error.statusCode || 500).json({ message: error.statusCode ? error.message : 'Server error', error: error.message });
   }
 };
 
@@ -138,7 +138,7 @@ exports.getBillingByAppointment = async (req, res) => {
 
     res.json(invoice);
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message });
+    res.status(error.statusCode || 500).json({ message: error.statusCode ? error.message : 'Server error', error: error.message });
   }
 };
 
@@ -160,7 +160,7 @@ exports.getInvoiceById = async (req, res) => {
 
     res.json(invoice);
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message });
+    res.status(error.statusCode || 500).json({ message: error.statusCode ? error.message : 'Server error', error: error.message });
   }
 };
 
@@ -201,7 +201,7 @@ exports.updatePaymentStatus = async (req, res) => {
 
     res.json(updated);
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message });
+    res.status(error.statusCode || 500).json({ message: error.statusCode ? error.message : 'Server error', error: error.message });
   }
 };
 
@@ -224,6 +224,6 @@ exports.deleteInvoice = async (req, res) => {
 
     res.json({ message: 'Invoice cancelled successfully' });
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message });
+    res.status(error.statusCode || 500).json({ message: error.statusCode ? error.message : 'Server error', error: error.message });
   }
 };

@@ -77,7 +77,7 @@ exports.register = async (req, res) => {
       },
     });
   } catch (error) {
-    return res.status(500).json({ message: 'Server error', error: error.message });
+    return res.status(error.statusCode || 500).json({ message: error.statusCode ? error.message : 'Server error', error: error.message });
   }
 };
 
@@ -122,7 +122,7 @@ exports.login = async (req, res) => {
     });
   } catch (error) {
     console.error('❌ Login error:', error.message);
-    return res.status(500).json({ message: 'Server error', error: error.message });
+    return res.status(error.statusCode || 500).json({ message: error.statusCode ? error.message : 'Server error', error: error.message });
   }
 };
 
@@ -207,6 +207,6 @@ exports.createDoctorAccount = async (req, res) => {
       },
     });
   } catch (error) {
-    return res.status(500).json({ message: 'Server error', error: error.message });
+    return res.status(error.statusCode || 500).json({ message: error.statusCode ? error.message : 'Server error', error: error.message });
   }
 };

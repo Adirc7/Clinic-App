@@ -43,6 +43,13 @@ const saveFile = async (file, folder = 'misc') => {
     return uploadToCloudinary(file, folder);
   }
 
+  if (process.env.VERCEL) {
+    // Vercel functions can't keep files on disk
+    const err = new Error('File uploads need Cloudinary on this server. Add CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY and CLOUDINARY_API_SECRET.');
+    err.statusCode = 503;
+    throw err;
+  }
+
   if (!fs.existsSync(UPLOAD_DIR)) fs.mkdirSync(UPLOAD_DIR, { recursive: true });
   const filename = safeName(file.originalname);
   await fs.promises.writeFile(path.join(UPLOAD_DIR, filename), file.buffer);

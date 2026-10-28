@@ -38,7 +38,7 @@ exports.createReview = async (req, res) => {
 
     res.status(201).json(review);
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message });
+    res.status(error.statusCode || 500).json({ message: error.statusCode ? error.message : 'Server error', error: error.message });
   }
 };
 
@@ -58,7 +58,7 @@ exports.getReviews = async (req, res) => {
 
     res.json(reviews.map((r) => (r.isAnonymous ? { ...r, patientId: null } : r)));
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message });
+    res.status(error.statusCode || 500).json({ message: error.statusCode ? error.message : 'Server error', error: error.message });
   }
 };
 
@@ -73,6 +73,6 @@ exports.getDoctorReviews = async (req, res) => {
 
     res.json(reviews);
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message });
+    res.status(error.statusCode || 500).json({ message: error.statusCode ? error.message : 'Server error', error: error.message });
   }
 };
