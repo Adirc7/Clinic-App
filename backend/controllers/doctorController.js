@@ -3,6 +3,7 @@ const Appointment = require('../models/Appointment');
 const Patient = require('../models/Patient');
 const Review = require('../models/Review');
 const { saveFile } = require('../utils/fileStorage');
+const { dayRange } = require('../utils/clinicTime');
 
 // @desc    Create new doctor profile
 // @route   POST /api/doctors
@@ -285,9 +286,8 @@ exports.getAdminStats = async (req, res) => {
     const totalDoctors = await Doctor.countDocuments({ isActive: true });
     const totalAppointments = await Appointment.countDocuments();
 
-    const today = new Date();
-    const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-    const todayEnd = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1);
+    // "Today" in the clinic's timezone, not the server's
+    const { start: todayStart, end: todayEnd } = dayRange(Date.now());
 
     const todayAppointments = await Appointment.countDocuments({
       date: { $gte: todayStart, $lt: todayEnd },

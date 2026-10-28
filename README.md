@@ -54,11 +54,11 @@ The backend also runs as a Vercel Function (it connects to MongoDB on the first 
 
 1. On [vercel.com](https://vercel.com): **Add New → Project** → import this repo.
 2. **Root Directory:** `backend` · **Application Preset:** Express. Leave the build settings empty.
-3. **Environment Variables:** paste the same values as `.env` (`MONGO_URI`, `JWT_SECRET`, `JWT_REFRESH_SECRET`, `ADMIN_*`, `TZ=Asia/Colombo`) **plus the three `CLOUDINARY_*` keys** — Vercel has no disk, so uploads need Cloudinary.
+3. **Environment Variables:** paste the same values as `.env` (`MONGO_URI`, `JWT_SECRET`, `JWT_REFRESH_SECRET`, `ADMIN_*`) **plus the three `CLOUDINARY_*` keys** — Vercel has no disk, so uploads need Cloudinary.
 4. **Deploy**, then open `https://<project>.vercel.app/api/health` — it should show `"database": "connected"` and `"fileStorage": "cloudinary"`.
 5. Set `EXPO_PUBLIC_API_URL=https://<project>.vercel.app/api` in `frontend/.env`.
 
-Limits on Vercel: uploads up to **4 MB** each; the free Hobby plan is for non-commercial use. `vercel.json` runs the function in Singapore (`sin1`).
+Don't add `TZ` (Vercel reserves it) — the backend already uses Sri Lanka time for bookings and holidays. Limits on Vercel: uploads up to **4 MB** each; the free Hobby plan is for non-commercial use. `vercel.json` runs the function in Singapore (`sin1`).
 
 ## Project structure
 

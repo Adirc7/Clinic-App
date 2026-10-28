@@ -5,21 +5,8 @@ const Billing = require('../models/Billing');
 const GlobalSetting = require('../models/GlobalSetting');
 const Holiday = require('../models/Holiday');
 
-// Formats a Date as YYYY-MM-DD in the server's timezone (set TZ=Asia/Colombo when hosting)
-const toDateKey = (d) => {
-  const date = new Date(d);
-  const m = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
-  return `${date.getFullYear()}-${m}-${day}`;
-};
-
-const dayRange = (d) => {
-  const start = new Date(d);
-  start.setHours(0, 0, 0, 0);
-  const end = new Date(start);
-  end.setDate(end.getDate() + 1);
-  return { start, end };
-};
+// Dates are worked out in the clinic's timezone (Sri Lanka), whatever the server's clock is
+const { toDateKey, dayRange, weekday, startOfDay, todayStart } = require('../utils/clinicTime');
 
 // Attach patient profiles with ONE query instead of one per appointment
 const attachPatientProfiles = async (appointments) => {
@@ -45,16 +32,14 @@ const validateSlot = async ({ doctorId, date, time, excludeId, enforceWindow = t
   if (Number.isNaN(when.getTime())) return { status: 400, message: 'Invalid appointment date.' };
 
   const { start, end } = dayRange(when);
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
+  const today = todayStart();
 
   // Never in the past (for anyone)
   if (start < today) return { status: 400, message: 'You cannot choose a date in the past.' };
 
   if (enforceWindow) {
     const settings = (await GlobalSetting.findOne().lean()) || { allowAnytimeBooking: false, minBookingDays: 3 };
-    const earliest = new Date(today);
-    if (!settings.allowAnytimeBooking) earliest.setDate(earliest.getDate() + (settings.minBookingDays || 0));
+    const earliest = settings.allowAnytimeBooking ? today : todayStart(settings.minBookingDays || 0);
     if (start < earliest) {
       return { status: 400, message: `Appointments must be booked at least ${settings.minBookingDays} days in advance.` };
     }
@@ -66,8 +51,8 @@ const validateSlot = async ({ doctorId, date, time, excludeId, enforceWindow = t
   if (checkSchedule) {
     const doctor = await Doctor.findById(doctorId).select('schedule').lean();
     const days = doctor?.schedule?.days || [];
-    if (days.length && !days.some((d) => d.day === DAY_NAMES[when.getDay()])) {
-      return { status: 400, message: `The doctor does not work on ${DAY_NAMES[when.getDay()]}s.` };
+    if (days.length && !days.some((d) => d.day === DAY_NAMES[weekday(when)])) {
+      return { status: 400, message: `The doctor does not work on ${DAY_NAMES[weekday(when)]}s.` };
     }
   }
 
@@ -435,9 +420,7 @@ exports.deleteAppointment = async (req, res) => {
         return res.status(400).json({ message: `This appointment is already ${appointment.status.toLowerCase()}.` });
       }
       if (req.user.role === 'patient') {
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        if (new Date(appointment.date) < today) {
+        if (startOfDay(appointment.date) < todayStart()) {
           return res.status(400).json({ message: 'Past appointments cannot be cancelled.' });
         }
       }
@@ -490,13 +473,7 @@ exports.requestReschedule = async (req, res) => {
     }
 
     // Check if the appointment is today (doctor cannot reschedule on the day of the appointment)
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    
-    const appointmentDate = new Date(appointment.date);
-    appointmentDate.setHours(0, 0, 0, 0);
-
-    if (appointmentDate.getTime() === today.getTime()) {
+    if (toDateKey(appointment.date) === toDateKey(Date.now())) {
       return res.status(400).json({ message: 'Cannot request a reschedule on the same day as the appointment.' });
     }
 
