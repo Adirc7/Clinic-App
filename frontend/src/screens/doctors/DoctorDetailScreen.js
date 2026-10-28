@@ -18,7 +18,7 @@ import axiosInstance from '../../api/axiosInstance';
 import Avatar from '../../components/Avatar';
 import { Button, GradientHeader } from '../../components/ui';
 import { colors, doctorName, radius, shadow } from '../../theme';
-import DateTimePicker from '@react-native-community/datetimepicker';
+import DateField from '../../components/DateField';
 import { Calendar } from 'react-native-calendars';
 import { toDateKey, addDays } from '../../utils/date';
 
@@ -47,7 +47,6 @@ export default function DoctorDetailScreen({ route, navigation, currentUser }) {
     phone: editingAppointment?.patientPhone || '',
     reason: editingAppointment?.description?.split('Reason: ')[1] || '',
   });
-  const [showDatePicker, setShowDatePicker] = useState(false);
   const [errors, setErrors] = useState({});
   const [settings, setSettings] = useState({ allowAnytimeBooking: false, minBookingDays: 3 });
   const [holidays, setHolidays] = useState([]);
@@ -61,18 +60,25 @@ export default function DoctorDetailScreen({ route, navigation, currentUser }) {
         ]);
         setSettings(settingsRes.data);
         setHolidays(holidayRes.data || []);
+        // New booking by a patient: fill DOB / address from their saved profile
+        if (!editingAppointment && currentUser?.role === 'patient') {
+          const prof = await axiosInstance.get('/patients/profile').catch(() => null);
+          const p = prof?.data;
+          if (p) {
+            setFormData((f) => ({
+              ...f,
+              dob: p.dateOfBirth ? new Date(p.dateOfBirth) : f.dob,
+              gender: p.gender === 'Female' ? 'Female' : f.gender,
+              address: f.address || p.address || '',
+            }));
+          }
+        }
       } catch (error) {
         console.log('Fetch error:', error);
       }
     };
     fetchData();
   }, []);
-
-  const onDateChange = (event, selectedDate) => {
-    const currentDate = selectedDate || formData.dob;
-    setShowDatePicker(false);
-    setFormData({ ...formData, dob: currentDate });
-  };
 
   const handleOpenForm = async () => {
     if (!selectedDate || !selectedTime) {
@@ -564,23 +570,13 @@ export default function DoctorDetailScreen({ route, navigation, currentUser }) {
               </View>
 
               <Text style={styles.label}>Date of Birth <Text style={{color: 'red'}}>*</Text></Text>
-              <TouchableOpacity 
-                style={[styles.datePickerBtn, errors.dob && styles.inputError]} 
-                onPress={() => setShowDatePicker(true)}
-              >
-                <Text style={styles.datePickerText}>{toDateKey(formData.dob)}</Text>
-                <Ionicons name="calendar-outline" size={20} color={colors.primary} />
-              </TouchableOpacity>
+              <DateField
+                value={formData.dob}
+                onChange={(dob) => setFormData((f) => ({ ...f, dob }))}
+                maximumDate={new Date()}
+                error={!!errors.dob}
+              />
               {errors.dob && <Text style={[styles.errorText, { marginTop: -10, marginBottom: 10 }]}>{errors.dob}</Text>}
-              {showDatePicker && (
-                <DateTimePicker
-                  value={formData.dob}
-                  mode="date"
-                  display="default"
-                  onChange={onDateChange}
-                  maximumDate={new Date()}
-                />
-              )}
 
               <Text style={styles.label}>Gender</Text>
               <View style={styles.genderRow}>

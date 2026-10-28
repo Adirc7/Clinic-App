@@ -15,8 +15,8 @@ const KINDS = {
   info: { icon: 'information-circle', fg: colors.info, bg: colors.infoSoft },
 };
 
-// Remove leading emoji like "✅ " from titles — the card shows its own icon
-const cleanTitle = (t = '') => t.replace(/^[^\p{L}\p{N}]+/u, '').trim();
+// Remove emoji like "✅" at the start/end of titles — the card shows its own icon
+const cleanTitle = (t = '') => t.replace(/^[^\p{L}\p{N}]+/u, '').replace(/[\s\p{Extended_Pictographic}\uFE0F]+$/u, '').trim();
 
 // Pick the card style from the wording, so existing Alert.alert calls need no changes
 const kindOf = (title = '', message = '', buttons = []) => {

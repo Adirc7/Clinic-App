@@ -12,7 +12,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import * as DocumentPicker from 'expo-document-picker';
-import DateTimePicker from '@react-native-community/datetimepicker';
+import DateField from '../../components/DateField';
 import axiosInstance, { getErrorMessage } from '../../api/axiosInstance';
 
 export default function AddMedicalRecordScreen({ navigation, route }) {
@@ -22,7 +22,6 @@ export default function AddMedicalRecordScreen({ navigation, route }) {
   const [description, setDescription] = useState('');
   const [relatedDoctor, setRelatedDoctor] = useState('');
   const [recordDate, setRecordDate] = useState(new Date());
-  const [showDatePicker, setShowDatePicker] = useState(false);
   const [file, setFile] = useState(null);
   const [loading, setLoading] = useState(false);
 
@@ -114,25 +113,7 @@ export default function AddMedicalRecordScreen({ navigation, route }) {
 
         <View style={styles.formGroup}>
           <Text style={styles.label}>Date of Record <Text style={styles.required}>*</Text></Text>
-          <TouchableOpacity 
-            style={styles.datePickerBtn}
-            onPress={() => setShowDatePicker(true)}
-          >
-            <Ionicons name="calendar-outline" size={20} color="#666" />
-            <Text style={styles.datePickerText}>{recordDate.toLocaleDateString()}</Text>
-          </TouchableOpacity>
-          {showDatePicker && (
-            <DateTimePicker
-              value={recordDate}
-              mode="date"
-              display="default"
-              maximumDate={new Date()}
-              onChange={(event, selectedDate) => {
-                setShowDatePicker(false);
-                if (selectedDate) setRecordDate(selectedDate);
-              }}
-            />
-          )}
+          <DateField value={recordDate} onChange={setRecordDate} maximumDate={new Date()} iconLeft style={[styles.datePickerBtn, { marginBottom: 0 }]} textStyle={styles.datePickerText} />
         </View>
 
         <View style={styles.formGroup}>
