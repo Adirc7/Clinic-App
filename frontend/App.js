@@ -1,7 +1,13 @@
 import React from 'react';
-import './src/utils/webAlert';
+import AlertHost from './src/components/AlertHost';
 import AppNavigator from './src/navigation/AppNavigator';
 
 export default function App() {
-  return <AppNavigator />;
+  return (
+    <>
+      <AppNavigator />
+      {/* Shows every Alert.alert(...) as a styled pop-up card (phone and web) */}
+      <AlertHost />
+    </>
+  );
 }

@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   Alert,
   KeyboardAvoidingView,
@@ -52,12 +52,17 @@ export function AuthField({ label, icon, error, valid, right, ...inputProps }) {
   );
 }
 
-export default function LoginScreen({ navigation, onLogin }) {
-  const [email, setEmail] = useState('');
+export default function LoginScreen({ navigation, route, onLogin }) {
+  const [email, setEmail] = useState(route?.params?.email || '');
   const [password, setPassword] = useState('');
   const [secureText, setSecureText] = useState(true);
   const [loading, setLoading] = useState(false);
   const [touched, setTouched] = useState({ email: false, password: false });
+
+  // Coming back from Register: fill in the new account's email
+  useEffect(() => {
+    if (route?.params?.email) setEmail(route.params.email);
+  }, [route?.params?.email]);
 
   const errors = useMemo(() => {
     const e = {};

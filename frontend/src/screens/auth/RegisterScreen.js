@@ -78,8 +78,10 @@ export default function RegisterScreen({ navigation }) {
         password,
         role: 'patient',
       });
+      const registeredEmail = email.trim().toLowerCase();
       Alert.alert('✅ Account Created', 'Your MediCare account has been created. Please sign in.', [
-        { text: 'Sign In', onPress: () => navigation.goBack() },
+        // Always land on the Sign in screen with the new email filled in
+        { text: 'Sign In', onPress: () => navigation.navigate('Login', { email: registeredEmail }) },
       ]);
     } catch (error) {
       Alert.alert('Registration Failed', getErrorMessage(error, 'Registration failed. Please try again.'));
@@ -181,7 +183,7 @@ export default function RegisterScreen({ navigation }) {
 
             <View style={styles.footer}>
               <Text style={styles.footerText}>Already have an account?</Text>
-              <Pressable onPress={() => navigation.goBack()} hitSlop={8}>
+              <Pressable onPress={() => navigation.navigate('Login')} hitSlop={8}>
                 <Text style={styles.link}>Sign in</Text>
               </Pressable>
             </View>
