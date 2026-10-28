@@ -27,16 +27,21 @@ if (missing.length) {
 
 // ── Database connection (shared by every request; reused between serverless calls) ──
 let connectPromise = null;
+let lastDbError = null; // shown on /api/health to help diagnose hosting problems
+
 const connectDB = () => {
   if (mongoose.connection.readyState === 1) return Promise.resolve();
   if (!connectPromise) {
     connectPromise = mongoose
       .connect(process.env.MONGO_URI, { serverSelectionTimeoutMS: 15000 })
       .then(async () => {
+        lastDbError = null;
         console.log(`MongoDB connected (${mongoose.connection.name})`);
         await ensureDefaultAdmin().catch((err) => console.log('Admin bootstrap error:', err.message));
       })
       .catch((err) => {
+        // Never expose the password: strip anything between "//" and "@"
+        lastDbError = String(err.message || err).replace(/\/\/[^@\s]*@/g, '//***@').slice(0, 300);
         connectPromise = null; // allow a retry on the next request
         throw err;
       });
@@ -94,6 +99,10 @@ app.get(['/api/health', '/api/test'], async (req, res) => {
   res.json({
     message: 'Backend API is running successfully',
     database: states[mongoose.connection.readyState] || 'unknown',
+    ...(mongoose.connection.readyState !== 1 && lastDbError ? { databaseError: lastDbError } : {}),
+    ...(mongoose.connection.readyState !== 1 && process.env.MONGO_URI
+      ? { mongoUriLooksLike: process.env.MONGO_URI.replace(/\/\/[^@\s]*@/, '//***@').slice(0, 60) + '…' }
+      : {}),
     fileStorage: isCloudinaryEnabled() ? 'cloudinary' : IS_SERVERLESS ? 'not configured (add Cloudinary keys)' : 'local',
     time: new Date().toISOString(),
   });
